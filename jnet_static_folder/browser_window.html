@@ -1,0 +1,153 @@
+
+<html>
+
+    <header>
+        <clientCache cacheControlMode="DisableCache" />
+
+      <script type="text/javascript" src="/eel.js"></script>
+      <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+      <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/css/bootstrap.min.css">
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-beta.2/js/bootstrap.min.js"></script>
+      <link rel="stylesheet" href="browser_style.css?v=232">
+      <script defer="" src="https://use.fontawesome.com/releases/v5.0.9/js/all.js" integrity="sha384-8iPTk2s/jMVj81dnzb/iFR2sdA7u06vHJyyLlAd4snFpCl/SnyUjRrbdJsw1pGIl" crossorigin="anonymous"></script>
+      <link href="https://fonts.googleapis.com/css?family=Istok+Web|Roboto+Slab" rel="stylesheet">
+      <link href = "https://code.jquery.com/ui/1.10.4/themes/ui-lightness/jquery-ui.css"
+         rel = "stylesheet">
+         <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+  
+      <script src='browser_js.js?v=31313'></script>
+    </header>
+
+      <body>
+
+   <div class='main_action_wrapper'>
+    
+    <div class='tabs'>
+      <div class='all_tabs'>
+        <div class='tab tab_item tab_anchor' id='tab0'>
+          <p class='browser_text'><strong>Home</strong></p>
+        </div>
+      </div>
+      <!--
+      <div class='tab tab_item' id='tab1'></div>
+      <div class='tab tab_item' id='tab2'></div>
+      <div class='tab tab_item' id='tab3'></div>
+    -->
+      <button class='add_tab'><i class="fas fa-plus" style='margin-top:-3px;'></i></button>
+    </div>
+
+  <!--
+  <table style='margin-left:0px;margin-top:0px;'>
+    <tr class='full_tabs'>
+      <td class='page_tab' style='background-color:red'>
+      </td>
+      <td class='page_tab' style='background-color:blue'></td>
+      <td class='page_tab' style='background-color:green'></td>
+    </tr>
+  </table>
+-->
+  </div>
+  <div class='input_wrapper'>
+    <div class='browser_input'>
+      <div class='navigation'>
+        <table>
+          <tr>
+            <td>
+              <button class='nav back'>
+                <!--<i class="fas fa-arrow-left" style='text-align: center;vertical-align: middle;line-height:40px;margin-left:11px;'></i>-->
+                <i class="fas fa-chevron-left arrow"></i>
+              </button>
+            </td>
+            <td>
+                <button class='nav forward'>
+                  <!--<i class="fas fa-arrow-right" style='text-align: center;vertical-align: middle;line-height:40px;margin-left:11px;'></i>-->
+                  <i class="fas fa-chevron-right arrow"></i>
+                </button>
+            </td>
+          </tr>
+        </table>
+      </div>
+      <div class='input_section'>
+        <input class='url_input' type='text' placeholder='Search....' value='jnet:@'>
+      </div>
+      <div class='controls'>
+
+        <table style='margin-top:10px;'>
+          <tr>
+            <td class='col-md-auto'>
+            <div class='settings_bar_widgets settings'>
+              Settings
+            </div>
+            </td>
+            <td class='col-md-auto'>
+              <div class='settings_bar_widgets apps'>
+                <strong>Apps</strong>
+              </div>
+            </td>
+            <td class='col-md-auto'>
+              <div class='settings_bar_widgets signin'>
+                Guest
+              </div>
+            </td>
+          </tr>
+        </table>
+
+      </div>
+    </div>
+  </div>
+<div class='content_place'>
+  <div class='loading_bar'>
+  <div class='spacer' style='height:200px;'></div>
+    <div class='loader'></div>
+
+  </div>
+  <div class='__welcome_banner'>
+  <div class="row">
+      <div class="column">
+        <div id='triangle-topleft'></div>
+      </div>
+      <div class="column">
+        <div class='spacer' style='height:70px;'></div>
+        <div class='main_input'>
+    
+          <h1 class='banner_text'>Welcome to the jNet Browser</h1>
+          <div class='spacer' style='height:10px;'></div>
+          <p class='description_text'>Please enter the information below. <a href='www.google.com'>Why?</a></p>
+          <div class='spacer' style='height:40px;'></div>
+          <div class='input_vals'>
+            <p class='description_text'><strong>Firstname:</strong></p>
+    
+            <input type='text' class='jnet_input' id='firstname'>
+            <div id='firstnamewarning'></div>
+              <div class='spacer' style='height:10px;'></div>
+            <p class='description_text'><strong>Lastname:</strong></p>
+    
+            <input type='text' class='jnet_input' id='lastname'>
+            <div id='lastnamewarning'></div>
+              <div class='spacer' style='height:10px;'></div>
+            <p class='description_text'><strong>Choose a username:</strong></p>
+    
+            <input type='text' class='jnet_input' id='username'>
+            <div id='usernamewarning'></div>
+              <div class='spacer' style='height:10px;'></div>
+            <p class='description_text'><strong>Email (optional):</strong></p>
+            <input type='email' class='jnet_input' id='email'>
+            <div class='spacer' style='height:20px;'></div>
+          </div>
+            <button class='setup_button next_action'>Next</button>
+        </div>
+    
+      </div>
+    
+    </div>
+  </div>
+
+  
+ 
+</div>
+
+
+
+      </body>
+
+    </html>

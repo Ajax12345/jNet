@@ -1,0 +1,314 @@
+body{
+    margin:0;
+    font-family: 'Istok Web', sans-serif;
+  }
+  .page_tab{
+      height:50px;
+      width:100px;
+    }
+    .tabs{
+   
+      padding-bottom:5px;
+      background-color: #D8D8D8;
+    
+    
+    }
+    .footer {
+      position: fixed;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      background-color: red;
+      color: white;
+      text-align: center;
+    }
+    .tab_item {
+        float: left;
+        width: 10%;
+        padding: 10px;
+        font-family: 'Istok Web', sans-serif;
+    
+    }
+    
+    .tab{
+      height: 40px;
+      background-color:blue;
+      border:solid;
+      border-bottom:none;
+      border-color:#8E8E8E;
+      border-width:1px;
+      border-top-right-radius: 3px;
+      border-top-left-radius: 3px;
+      font-family: 'Istok Web', sans-serif;
+    }
+    .tab:hover{
+      border-top:solid;
+      border-top-color: #FF8C00;
+    
+    }
+    .tabs:after {
+        content: "";
+        display: table;
+    
+    
+    }
+    .add_tab{
+      border:none;
+      width:3%;
+      height:30px;
+      margin-top:5px;
+      margin-left:10px;
+      padding:10px;
+      background-color: #AFAEAE;
+      border-radius:3px;
+    }
+    .add_tab:focus{
+      outline:none;
+    }
+    .add_tab:hover{
+      transition: 0.2s;
+      opacity:0.8;
+    }
+    .tab_anchor{
+      background-color:rgb(222, 222, 222);
+    }
+    .browser_text{
+      color:black;
+      font-size:14px;
+      font-family: 'Istok Web', sans-serif;
+    }
+    .delete_tab{
+      float:right;
+      background:none;
+      border:none;
+      color:white;
+      margin-top:-35px;
+    }
+    .delete_tab:hover{
+    
+      background-color: #FF8C00;
+      border-radius:50%;
+    }
+    
+    div.deletion_pane{
+      display: none;
+    }
+    
+    div.tab:hover div.deletion_pane {
+    
+            display: block;
+    }
+    div.tab:hover{
+      background-color: #DEDEDE;
+    }
+    .input_wrapper{
+      background-color: #EAEAEA;
+    
+    }
+    .browser_input:after {
+        content: "";
+        display: table;
+        clear: both;
+    }
+    
+    .navigation{
+      float: left;
+        width: 7%;
+        padding: 10px;
+    
+    }
+    .input_section{
+    
+      float: left;
+        width: 60%;
+        padding: 10px;
+    
+    }
+    .controls{
+      float: left;
+        width: 30%;
+        padding: 10px;
+    
+    }
+    
+    .url_input{
+      margin-top:5px;
+      width:100%;
+      height:35px;
+      border-style:solid;
+      border-radius: 5px;
+      border-color:#BCBCBC;
+      border-width:0.5px;
+      padding-left:10px;
+    
+    }
+    
+    .url_input:focus{
+      outline:none;
+      border-color:#FF8C00;
+    }
+    .nav{
+    
+      border-radius:50%;
+      width:30px;
+      height:30px;
+      padding-top:10px;
+      padding-left:20px;
+      border:none;
+      background: none;
+    
+    }
+    
+    .arrow{
+      font-size:1.5em;
+      color:#FF8C00;
+    }
+    .timesdeletion{
+      font-size:0.8em;
+    }
+    
+    .settings_bar_widgets{
+      padding:5px;
+      border-radius:3px;
+      background:none;
+      font-size:15px;
+      font-family: 'Istok Web', sans-serif;
+    }
+    .settings_bar_widgets:hover{
+      background-color: #FF8C00;
+      color:black;
+      font-family: 'Istok Web', sans-serif;
+    }
+    
+
+    .loader {
+  
+      margin:0 auto;
+      border: 16px solid #f3f3f3; /* Light grey */
+      border-top: 16px solid #FF8C00; /* Blue */
+      border-radius: 50%;
+      width: 120px;
+      height: 120px;
+      animation: spin 2s linear infinite;
+  }
+  
+  @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+  }
+
+  /**************************************/
+  .main_input{
+    margin:0 auto;
+    width:700px;
+    height:700px;
+  
+  }
+  
+  #triangle-topleft {
+  
+        width: 0;
+        height:0;
+        border-top: 680px solid #FF8C00;
+        border-right: 680px solid transparent;
+  
+      }
+  
+      /* Create three equal columns that floats next to each other */
+  .column {
+          float: left;
+          width: 50%;
+  
+           /* Should be removed. Only for demonstration */
+  }
+  
+      /* Clear floats after the columns */
+  .row:after {
+          content: "";
+          display: table;
+          clear: both;
+  }
+  
+  .banner_text{
+    font-family: 'Istok Web', sans-serif;
+  }
+  
+  .jnet_input{
+    margin-top:-20px;
+    font-family: 'Istok Web', sans-serif;
+    border:none;
+    border-bottom:solid;
+    border-bottom-width:2px;
+    border-bottom-color:#FF8C00;
+    width:400px;
+    height:50px;
+    font-size:18px;
+  
+  
+  
+  }
+  .jnet_input:focus{
+    outline:none;
+    border-bottom-color: #2AE1A1;
+  }
+  
+  tr.input_info>td {
+    padding-bottom: 1em;
+  }
+  
+  .description_text{
+    font-family: 'Istok Web', sans-serif;
+    color:black;
+    font-size:22px;
+  }
+  .setup_button{
+    font-family: 'Istok Web', sans-serif;
+    float:right;
+    border:solid;
+    border-width:2px;
+    padding-left:10px;
+    padding-right:10px;
+    padding-top:5px;
+    padding-bottom:5px;
+    border-radius:5px;
+    border-color:#FF8C00;
+    margin-right:300px;
+    font-size:20px;
+  }
+  
+  .setup_button:hover{
+    background-color: #FF8C00;
+  
+  }
+  
+  .warning_text{
+    font-family: 'Istok Web', sans-serif;
+    color:#E54A2B;
+  }
+
+  .home_page_search{
+    margin:0 auto;
+    width:600px;
+    height:auto;
+   
+  }
+  .large_url_input{
+    margin-left:60px;
+    margin:0 auto;
+    width:560px;
+    height:40px;
+    border-radius:20px;
+    border:solid;
+    border-width:1.7px;
+    border-color:#FF8C00;
+  }
+
+  .large_url_input:focus{
+    outline:none;
+  }
+  
+  .error_listing_text{
+    font-family: 'Istok Web', sans-serif;
+    font-size:14px;
+    color:gray;
+  }

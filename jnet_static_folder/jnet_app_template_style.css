@@ -1,0 +1,25 @@
+.outer_wrapper{
+    width:600px;
+    height:300px;
+    border:solid;
+    border-radius:10px;
+    color:#FF8C00;
+    text-align:center;
+    margin:0 auto;
+
+}
+
+.welcome_banner{
+    font-family: 'Istok Web', sans-serif;
+    color:black;
+
+}
+.welcome_text{
+    font-family: 'Istok Web', sans-serif;
+    color:black;
+}
+
+a{
+    font-family: 'Istok Web', sans-serif;
+    color:#FF8C00;
+}
