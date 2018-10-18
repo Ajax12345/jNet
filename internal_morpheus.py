@@ -1,5 +1,5 @@
 import socket, pickle
-import interal_jnet_port_forwarding as jnet_port_forwarding
+import internal_jnet_port_forwarding as jnet_port_forwarding
 import typing
 
 def on_connection(_func:typing.Callable) -> typing.Callable:
