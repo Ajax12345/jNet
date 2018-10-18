@@ -1,0 +1,2 @@
+class RouteDeclarationError(Exception):
+    pass
