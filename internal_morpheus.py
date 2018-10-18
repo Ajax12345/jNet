@@ -133,7 +133,7 @@ if __name__ == '__main__':
         _max_connections = 5
         main_host = ''
         lan_ip = jnet_port_forwarding.PortManager.get_my_ip()
-        root = 'zorro16'
+        root = 'PASSWORD'
         port = 6001
         from_port = 8423
         forward_ports = True
