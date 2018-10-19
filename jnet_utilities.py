@@ -158,3 +158,8 @@ def log_view(_f:typing.Callable) -> typing.Callable:
         conn.close()
         return _f(_payload)
     return _wrapper
+
+def get_attrs(_f:typing.Callable) -> typing.Callable:
+    def _wrapper(_url_obj, _response_obj):
+        return _f(_url_obj._original_url, _response_obj['route'])
+    return _wrapper
