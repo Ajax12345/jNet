@@ -13,6 +13,8 @@ class TelemoniusEnv:
         self.html = _content
         self.js = javascript
         self.css = css
+    def __iter__(self):
+        yield from [[i, getattr(self, i)] for i in ['html', 'js', 'css']]
     @property
     def response_type(self):
         return 'env'
@@ -29,6 +31,8 @@ class TelemoniusJasonify:
         return 'json'
     def __eq__(self, _val:str) -> bool:
         return self.response_type == _val
+    def __iter__(self):
+        yield from self._jsonified_results.items()
 
 class RouteResponse(typing.NamedTuple):
     route:str
