@@ -17,5 +17,5 @@ def request_1(_payload:dict) -> dict:
     import apps
     _app_inst = getattr(apps, f'app_{_payload["app"]}').app_routes.app
     _framework_results = _app_inst.build(_payload['path'], _sessions = _payload['session'], **_payload['forms'])
-    return {'session':_app_inst.sessions.session, 'response-type':[1, 2][_framework_results == 'env'], 'payload':_framework_results._jsonified_results if _framework_results == 'json' else {i:getattr(_framework_results, i) for i in ['html', 'css', 'js']}}
+    return {'route':_framework_results.route,'is_redirect':_framework_results.isredirect, 'session':_app_inst.sessions.session, 'response-type':[1, 2][_framework_results.content == 'env'], 'payload':dict(_framework_results)}
 
