@@ -2,6 +2,7 @@ import internal_morpheus as morpheus
 import re, jnet_utilities, json, requests
 import datetime, typing
 
+
 class ResponseTypes:
     class jNetEnv:
         def __eq__(self, _val:[int, str]) -> bool:
@@ -28,6 +29,20 @@ class ResponseTypes:
             return 1
     
 
+class BrowserResponse:
+    def __init__(self, response_type, **kwargs):
+        self.response_type = response_type
+        self.__dict__.update(kwargs)
+    @staticmethod
+    @jnet_utilities.get_attrs
+    def join_path(url_obj:str, response_obj:str) -> str:
+        return re.findall('^\w+:@\w+', url_obj)[0] + response_obj
+    @classmethod
+    def _to_browser_response(cls, server_response_type, _returned_payload:dict) -> typing.Callable:
+        if server_response_type == 'json':
+            return cls(server_response_type, **{'isredirect':_returned_payload['is_redirect'], 'route':_returned_payload['route'], 'payload':_returned_payload['payload']})
+        return cls(server_response_type, **{'isredirect':_returned_payload['is_redirect'], 'route':_returned_payload['route'], 'payload':ReadFrom(html='on_response.html', js=_server_result['payload']['js'], css=_server_result['payload']['css'])})
+        #ReadFrom(html='on_response.html', js=_server_result['js'], css=_server_result['css'])
 
 class ErrorSiteLookup:
     def __init__(self, bad_url:str) -> None:
@@ -107,14 +122,19 @@ def request_site_data(site_lookup, parsed_url, _tab_info, request_response_type,
     target_node = site_lookup.ip if site_lookup.ip != site_lookup.sender_ip else find_lan_hosting_node(parsed_url.app_name)
   
     if target_node is None:
-        with open('jnet_static_folder/url_name_error.html', 'w') as f:
-            f.write(open('url_name_error_template.html').read().format(parsed_url._original_url))
-        if update:
-            #num real, ip text, app text, url text, path text, session text
-            tigerSqlite.Sqlite('browser_settings/browser_tabs.db').update('tabs', [['ip', None], ['app', None], ['url', parsed_url._original_url], ['path', None], ['session', {}]], [['num', _tab_info.tabid]])
+        return_error_result = None
+        if request_response_type == 'env':
+            with open('jnet_static_folder/url_name_error.html', 'w') as f:
+                f.write(open('url_name_error_template.html').read().format(parsed_url._original_url))
+            if update:
+                #num real, ip text, app text, url text, path text, session text
+                tigerSqlite.Sqlite('browser_settings/browser_tabs.db').update('tabs', [['ip', None], ['app', None], ['url', parsed_url._original_url], ['path', None], ['session', {}]], [['num', _tab_info.tabid]])
+            else:
+                tigerSqlite.Sqlite('browser_settings/browser_tabs.db').insert('tabs', ('num', _tab_info.tabid), ('ip', None), ('app', None), ('url', parsed_url._original_url), ('path', None), ('session', {}))
+            return_error_result = ReadFrom(html='url_name_error.html', js=None, css=None)
         else:
-            tigerSqlite.Sqlite('browser_settings/browser_tabs.db').insert('tabs', ('num', _tab_info.tabid), ('ip', None), ('app', None), ('url', parsed_url._original_url), ('path', None), ('session', {}))
-        return ReadFrom(html='url_name_error.html', js=None, css=None)
+            return_error_result = {'status':'url name error'.replace(' ', '_').upper()}
+        return return_error_result
  
     print('target node', target_node)
     session = {} if not update else jnet_utilities.get_session(_tab_info.tabid)
@@ -140,10 +160,11 @@ def request_site_data(site_lookup, parsed_url, _tab_info, request_response_type,
     
     if request_response_type == 'json':
         if update:
-            tigerSqlite.Sqlite('browser_settings/browser_tabs.db').update('tabs', [['ip', site_lookup.ip], ['app', parsed_url.app_name], ['url', parsed_url._original_url], ['path', parsed_url.path], ['session', _server_result['session']]], [['num', _tab_info.tabid]])
+            tigerSqlite.Sqlite('browser_settings/browser_tabs.db').update('tabs', [['ip', site_lookup.ip], ['app', parsed_url.app_name], ['url', BrowserResponse.join_path(parsed_url, _server_result)], ['path', _server_result['route']], ['session', _server_result['session']]], [['num', _tab_info.tabid]])
         else:
-            tigerSqlite.Sqlite('browser_settings/browser_tabs.db').insert('tabs', ('num', _tab_info.tabid), ('ip', site_lookup.ip), ('app', parsed_url.app_name), ('url', parsed_url._original_url), ('path', parsed_url.path), ('session', _server_result['session']))
-        return _server_result['payload']
+            tigerSqlite.Sqlite('browser_settings/browser_tabs.db').insert('tabs', ('num', _tab_info.tabid), ('ip', site_lookup.ip), ('app', parsed_url.app_name), ('url', BrowserResponse.join_path(parsed_url, _server_result)), ('path', _server_result['route']), ('session', _server_result['session']))
+        return BrowserResponse._to_browser_response(request_response_type, _server_result)
+        
 
 
     with open('jnet_static_folder/on_response.html', 'w') as f:
@@ -157,12 +178,12 @@ def request_site_data(site_lookup, parsed_url, _tab_info, request_response_type,
             f.write(_server_result['payload']['css'])
 
     if update:
-        tigerSqlite.Sqlite('browser_settings/browser_tabs.db').update('tabs', [['ip', site_lookup.ip], ['app', parsed_url.app_name], ['url', parsed_url._original_url], ['path', parsed_url.path], ['session', _server_result['session']]], [['num', _tab_info.tabid]])
+        tigerSqlite.Sqlite('browser_settings/browser_tabs.db').update('tabs', [['ip', site_lookup.ip], ['app', parsed_url.app_name], ['url', BrowserResponse.join_path(parsed_url, _server_result)], ['path', _server_result['route']], ['session', _server_result['session']]], [['num', _tab_info.tabid]])
 
     else:
-        tigerSqlite.Sqlite('browser_settings/browser_tabs.db').insert('tabs', ('num', _tab_info.tabid), ('ip', site_lookup.ip), ('app', parsed_url.app_name), ('url', parsed_url._original_url), ('path', parsed_url.path), ('session', _server_result['session']))
+        tigerSqlite.Sqlite('browser_settings/browser_tabs.db').insert('tabs', ('num', _tab_info.tabid), ('ip', site_lookup.ip), ('app', parsed_url.app_name), ('url', BrowserResponse.join_path(parsed_url, _server_result)), ('path', _server_result['route']), ('session', _server_result['session']))
     
-    return ReadFrom(html='on_response.html', js=_server_result['js'], css=_server_result['css'])
+    return BrowserResponse._to_browser_response(request_response_type, _server_result)
     
 def get_site_resources(tab:int, url:str, request_response_type, forms={}) -> typing.NamedTuple:
     _tab = jnet_utilities.find_tab(tab)
@@ -189,4 +210,6 @@ def lookup_tab(tab:int, request_response_type, forms={}) -> typing.Callable:
             return ReadFrom(html='url_name_error.html', js=None, css=None)
         return {'status':'url name error'.replace(' ', '_').upper()}
     return get_site_resources(tab, _tab.url, request_response_type, forms=forms)
+
+
 
