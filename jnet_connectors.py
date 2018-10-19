@@ -38,10 +38,10 @@ class BrowserResponse:
     def join_path(url_obj:str, response_obj:str) -> str:
         return re.findall('^\w+:@\w+', url_obj)[0] + response_obj
     @classmethod
-    def _to_browser_response(cls, server_response_type, _returned_payload:dict) -> typing.Callable:
+    def _to_browser_response(cls, server_response_type, _returned_payload:dict, on_error = False) -> typing.Callable:
         if server_response_type == 'json':
             return cls(server_response_type, **{'isredirect':_returned_payload['is_redirect'], 'route':_returned_payload['route'], 'payload':_returned_payload['payload']})
-        return cls(server_response_type, **{'isredirect':_returned_payload['is_redirect'], 'route':_returned_payload['route'], 'payload':ReadFrom(html='on_response.html', js=_server_result['payload']['js'], css=_server_result['payload']['css'])})
+        return cls(server_response_type, **({'payload':ReadFrom(html='url_name_error.html', js=None, css=None), 'is_error':True} if on_error else {'isredirect':_returned_payload['is_redirect'], 'route':_returned_payload['route'], 'payload':ReadFrom(html='on_response.html', js=_server_result['payload']['js'], css=_server_result['payload']['css'])}))
         #ReadFrom(html='on_response.html', js=_server_result['js'], css=_server_result['css'])
 
 class ErrorSiteLookup:
@@ -131,7 +131,7 @@ def request_site_data(site_lookup, parsed_url, _tab_info, request_response_type,
                 tigerSqlite.Sqlite('browser_settings/browser_tabs.db').update('tabs', [['ip', None], ['app', None], ['url', parsed_url._original_url], ['path', None], ['session', {}]], [['num', _tab_info.tabid]])
             else:
                 tigerSqlite.Sqlite('browser_settings/browser_tabs.db').insert('tabs', ('num', _tab_info.tabid), ('ip', None), ('app', None), ('url', parsed_url._original_url), ('path', None), ('session', {}))
-            return_error_result = ReadFrom(html='url_name_error.html', js=None, css=None)
+            return_error_result = BrowserResponse._to_browser_response(request_response_type, None, on_error=True)
         else:
             return_error_result = {'status':'url name error'.replace(' ', '_').upper()}
         return return_error_result
@@ -155,7 +155,8 @@ def request_site_data(site_lookup, parsed_url, _tab_info, request_response_type,
                 tigerSqlite.Sqlite('browser_settings/browser_tabs.db').update('tabs', [['ip', None], ['app', None], ['url', parsed_url._original_url], ['path', None], ['session', {}]], [['num', _tab_info.tabid]])
             else:
                 tigerSqlite.Sqlite('browser_settings/browser_tabs.db').insert('tabs', ('num', _tab_info.tabid), ('ip', None), ('app', None), ('url', parsed_url._original_url), ('path', None), ('session', {}))
-            return ReadFrom(html='url_name_error.html', js=None, css=None)
+            return BrowserResponse._to_browser_response(request_response_type, None, on_error=True)
+            
         return {'status':'url name error'.replace(' ', '_').upper()}
     
     if request_response_type == 'json':
@@ -210,6 +211,4 @@ def lookup_tab(tab:int, request_response_type, forms={}) -> typing.Callable:
             return ReadFrom(html='url_name_error.html', js=None, css=None)
         return {'status':'url name error'.replace(' ', '_').upper()}
     return get_site_resources(tab, _tab.url, request_response_type, forms=forms)
-
-
 
