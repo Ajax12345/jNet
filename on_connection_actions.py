@@ -1,4 +1,4 @@
-import jnet_server_connector
+import jnet_server_connector, pickle
 
 
 def on_connection(c, addr) -> dict:
