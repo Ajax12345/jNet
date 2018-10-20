@@ -39,9 +39,10 @@ class BrowserResponse:
         return re.findall('^\w+:@\w+', url_obj)[0] + response_obj
     @classmethod
     def _to_browser_response(cls, server_response_type, _returned_payload:dict, on_error = False) -> typing.Callable:
+        print('returned payload here', _returned_payload)
         if server_response_type == 'json':
             return cls(server_response_type, **{'isredirect':_returned_payload['is_redirect'], 'route':_returned_payload['route'], 'payload':_returned_payload['payload']})
-        return cls(server_response_type, **({'payload':ReadFrom(html='url_name_error.html', js=None, css=None), 'is_error':True} if on_error else {'isredirect':_returned_payload['is_redirect'], 'route':_returned_payload['route'], 'payload':ReadFrom(html='on_response.html', js=_server_result['payload']['js'], css=_server_result['payload']['css'])}))
+        return cls(server_response_type, **({'payload':ReadFrom(html='url_name_error.html', js=None, css=None), 'is_error':True} if on_error else {'isredirect':_returned_payload['is_redirect'], 'route':_returned_payload['route'], 'payload':ReadFrom(html='on_response.html', js=_returned_payload['payload']['js'], css=_returned_payload['payload']['css'])}))
         #ReadFrom(html='on_response.html', js=_server_result['js'], css=_server_result['css'])
 
 class ErrorSiteLookup:
@@ -97,6 +98,7 @@ def connect_hosting_node(_ip, app_name):
 
 def find_lan_hosting_node(appname) -> typing.Any:
     for i in morpheus._lanOptions():
+        print(i)
         try:
             _r = connect_hosting_node(i, appname)
         except:
@@ -119,8 +121,9 @@ def find_lan_hosting_node(appname) -> typing.Any:
 
 @jnet_utilities.log_history
 def request_site_data(site_lookup, parsed_url, _tab_info, request_response_type, update=False, forms={}):
+    print('in here')
     target_node = site_lookup.ip if site_lookup.ip != site_lookup.sender_ip else find_lan_hosting_node(parsed_url.app_name)
-  
+    print('got target node:', target_node)
     if target_node is None:
         return_error_result = None
         if request_response_type == 'env':
@@ -199,7 +202,7 @@ def get_site_resources(tab:int, url:str, request_response_type, forms={}) -> typ
         tigerSqlite.Sqlite('browser_settings/browser_tabs.db').insert('tabs', ('num', tab), ('ip', None), ('app', None), ('url', url), ('path', None), ('session', {}))
         return {'status':'url name error'.replace(' ', '_').upper()}
         
-    return request_site_data(current_site, parsed, _tab, request_response_type, update=_tab is not None, forms=forms)
+    return request_site_data(current_site, parsed, _tab, request_response_type, update=bool(_tab), forms=forms)
     
 
 def lookup_tab(tab:int, request_response_type, forms={}) -> typing.Callable:
@@ -211,4 +214,5 @@ def lookup_tab(tab:int, request_response_type, forms={}) -> typing.Callable:
             return ReadFrom(html='url_name_error.html', js=None, css=None)
         return {'status':'url name error'.replace(' ', '_').upper()}
     return get_site_resources(tab, _tab.url, request_response_type, forms=forms)
+
 
