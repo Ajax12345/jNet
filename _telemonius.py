@@ -8,7 +8,13 @@ script_dir = os.path.dirname(__file__)
 
 import telemonius_routes, telemonius_wrappers
 
+def load_content(f:typing.Callable) -> typing.Callable:
+    def __wrapper(_inst, content:str, javascript:typing.Any=None, css:typing.Any = None):
+        return f(_inst, content, js=js if js is None else open(os.path.join(script_dir, f'templates/{js}')).read(), css=css if css is None else open(os.path.join(script_dir, f'templates/{css}')).read())
+    return __wrapper
+
 class TelemoniusEnv:
+    @load_content
     def __init__(self, _content:str, javascript=None, css=None):
         self.html = _content
         self.js = javascript
