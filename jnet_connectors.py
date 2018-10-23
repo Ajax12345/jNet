@@ -120,6 +120,7 @@ def find_lan_hosting_node(appname) -> typing.Any:
 
 
 @jnet_utilities.log_history
+@jnet_utilities.log_tab_history
 def request_site_data(site_lookup, parsed_url, _tab_info, request_response_type, update=False, forms={}):
     print('in here')
     target_node = site_lookup.ip if site_lookup.ip != site_lookup.sender_ip else find_lan_hosting_node(parsed_url.app_name)
