@@ -73,16 +73,36 @@ def server_loc(_server_name:str) -> str:
 def get_session(_tab_num:int) -> dict:
     return [b for a, b in tigerSqlite.Sqlite('browser_settings/browser_tabs.db').get_num_session('tabs') if a == _tab_num][0]
 
+def _max_history_id() -> int:
+    _d = [a for a, *_ in sqlite3.connect('browser_settings/browser_history.db').cursor().execute("SELECT * FROM history")]
+    return 1 if not _d else max(_d) + 1
+    
+
+def log_tab_history(f:typing.Callable) -> typing.Callable:
+    def _wrapper(site_obj, url, _tab, request_type, update=False, forms={}) -> typing.Any:
+        d = datetime.datetime.now()
+        timestamp = '-'.join(str(getattr(d, i)) for i in ['month', 'day', 'year'])+' '+':'.join(str(getattr(d, i)) for i in ['hour', 'minute', 'second'])
+        current_id = _max_history_id()
+        #[_max_history_id(), url.app_name, url.path, site_obj.ip, url.server, timestamp]
+        headers = ['id', 'app_name', 'url_path', 'ip', 'server', 'timestamp']
+        if update:
+            _current = [b for a, b in tigerSqlite.Sqlite('browser_settings/browser_tab_history.db').get_id_tabs('tab_history') if a == current_id][0]
+            tigerSqlite.Sqlite('browser_settings/browser_tab_history.db').update('tab_history', [['tabs', _current+[dict(zip(headers, [_max_history_id(), url.app_name, url.path, site_obj.ip, url.server, timestamp]))]]], [['id', current_id]])
+        else:
+            tigerSqlite.Sqlite('browser_settings/browser_tab_history.db').insert('tab_history', ('id', current_id), ('tabs', [dict(zip(headers, [_max_history_id(), url.app_name, url.path, site_obj.ip, url.server, timestamp]))]))
+        return f(site_obj, url, _tab, request_type, update=update, forms=forms)
+    return _wrapper
+
 def log_history(f:typing.Callable):
     def wrapper(site_obj, url, _tab, request_type, update=False, forms={}):
         d = datetime.datetime.now()
         timestamp = '-'.join(str(getattr(d, i)) for i in ['month', 'day', 'year'])+' '+':'.join(str(getattr(d, i)) for i in ['hour', 'minute', 'second'])
-        #app text, path text, ip text, server text, timestamp text
+        #id real, app text, path text, ip text, server text, timestamp text
         conn = sqlite3.connect('browser_settings/browser_history.db')
-        conn.execute("INSERT INTO history VALUES (?, ?, ?, ?, ?)", [url.app_name, url.path, site_obj.ip, url.server, timestamp])
+        conn.execute("INSERT INTO history VALUES (?, ?, ?, ?, ?)", [_max_history_id(), url.app_name, url.path, site_obj.ip, url.server, timestamp])
         conn.commit()
         conn.close()
-        return f(site_obj, url, _tab, request_type, update=update)
+        return f(site_obj, url, _tab, request_type, update=update, forms=forms)
     return wrapper
 
 
