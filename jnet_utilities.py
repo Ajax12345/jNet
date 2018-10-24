@@ -172,7 +172,7 @@ def log_view(_f:typing.Callable) -> typing.Callable:
         d = datetime.datetime.now()
         _timestamp = '-'.join(str(getattr(d, i)) for i in ['month', 'day', 'year']) + ' '+':'.join(str(getattr(d, i)) for i in ['hour', 'minute', 'second'])
         conn = sqlite3.connect(f'apps/app_{_payload["app"]}/__views__.db')
-        conn.execute("INSERT INTO views VALUES (?, ?, ?, ?, ?)", [_timestamp, _payload['ip'], _payload['sender'], _payload['path'], _payload['server']])
+        conn.execute("INSERT INTO views VALUES (?, ?, ?, ?, ?, ?)", [_timestamp, _payload['ip'], _payload['sender'], _payload['path'], _payload['server']])
         conn.commit()
         conn.close()
         return _f(_payload)
