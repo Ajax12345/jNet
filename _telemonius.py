@@ -10,7 +10,7 @@ import telemonius_routes, telemonius_wrappers
 
 def load_content(f:typing.Callable) -> typing.Callable:
     def __wrapper(_inst, content:str, javascript:typing.Any=None, css:typing.Any = None):
-        return f(_inst, content, javascript=javascript if js is None else open(os.path.join(script_dir, f'templates/{javascript}')).read(), css=css if css is None else open(os.path.join(script_dir, f'templates/{css}')).read())
+        return f(_inst, content, javascript=javascript if javascript is None else open(os.path.join(script_dir, f'templates/{javascript}')).read(), css=css if css is None else open(os.path.join(script_dir, f'templates/{css}')).read())
     return __wrapper
 
 class TelemoniusEnv:
