@@ -116,9 +116,14 @@ def get_full_username():
 @eel.expose
 def get_home_search():
     return open('jnet_static_folder/home_search_bar.html').read()
+
 @eel.expose
-def get_browser_history(keyword=''):
-    return jnet_utilities.jNetHistory.render_history(keyword=keyword)
+def get_browser_history():
+    return jnet_utilities.jNetHistory.render_history()
+
+@eel.expose
+def filter_browser_history(keyword):
+    return jnet_utilities.jNetHistory.render_filter_history(keyword)
 
 #eel.start('main_window.html')
 
