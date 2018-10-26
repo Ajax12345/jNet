@@ -60,6 +60,8 @@ class TabRow:
         self.__dict__ = {a:b for a, b in itertools.zip_longest(self.__class__.headers, args)}
     def __bool__(self):
         return any(getattr(self, i, None) for i in self.__class__.headers[1:])
+    def __repr__(self):
+        return f'{self.__class__.__name__}({self.__dict__})'
 
 def find_tab(tab_num:int) -> typing.NamedTuple:
         #num real, ip text, app text, url text, path text, session text
@@ -77,17 +79,39 @@ def _max_history_id() -> int:
     _d = [a for a, *_ in sqlite3.connect('browser_settings/browser_history.db').cursor().execute("SELECT * FROM history")]
     return 1 if not _d else max(_d) + 1
     
+def delete_bulk(_files = list(filter(lambda x:x.endswith('.db') and x.startswith('browser_'), os.listdir('browser_settings')))):
+    def _wrapper(f):
+        def perform_op():
+            for i in _files:
+                f(filename=i)
+        
+        def __wrapper(*args, **kwargs):
+            perform_op()
+        return __wrapper
+    return _wrapper
+
+@delete_bulk()
+def delete_from(filename='browser_history.db') -> None:
+    conn = sqlite3.connect(f'browser_settings/{filename}')
+    _tablename = re.sub('^[a-zA-Z]+_|\.db$', '', filename)
+    conn.execute(f"DELETE FROM {_tablename}")
+    conn.commit()
+    conn.close()
+
+def display_tables(filename='browser_history.db') -> typing.List[tuple]:
+    _tablename = re.sub('^[a-zA-Z]+_|\.db$', '', filename)
+    return list(sqlite3.connect(f'browser_settings/{filename}').cursor().execute(f"SELECT * FROM {_tablename}"))
 
 def log_tab_history(f:typing.Callable) -> typing.Callable:
     def _wrapper(site_obj, url, _tab, request_type, update=False, forms={}) -> typing.Any:
         d = datetime.datetime.now()
         timestamp = '-'.join(str(getattr(d, i)) for i in ['month', 'day', 'year'])+' '+':'.join(str(getattr(d, i)) for i in ['hour', 'minute', 'second'])
-        current_id = _max_history_id()
+        current_id =  _tab.tabid
         #[_max_history_id(), url.app_name, url.path, site_obj.ip, url.server, timestamp]
         headers = ['id', 'app_name', 'url_path', 'ip', 'server', 'timestamp']
         if update:
             _current = [b for a, b in tigerSqlite.Sqlite('browser_settings/browser_tab_history.db').get_id_tabs('tab_history') if a == current_id][0]
-            tigerSqlite.Sqlite('browser_settings/browser_tab_history.db').update('tab_history', [['tabs', _current+[dict(zip(headers, [_max_history_id(), url.app_name, url.path, site_obj.ip, url.server, timestamp]))]]], [['id', current_id]])
+            tigerSqlite.Sqlite('browser_settings/browser_tab_history.db').update('tab_history', [['tabs', _current+[dict(zip(headers, [_max_history_id()-1, url.app_name, url.path, site_obj.ip, url.server, timestamp]))]]], [['id', current_id]])
         else:
             tigerSqlite.Sqlite('browser_settings/browser_tab_history.db').insert('tab_history', ('id', current_id), ('tabs', [dict(zip(headers, [_max_history_id(), url.app_name, url.path, site_obj.ip, url.server, timestamp]))]))
         return f(site_obj, url, _tab, request_type, update=update, forms=forms)
@@ -99,7 +123,7 @@ def log_history(f:typing.Callable):
         timestamp = '-'.join(str(getattr(d, i)) for i in ['month', 'day', 'year'])+' '+':'.join(str(getattr(d, i)) for i in ['hour', 'minute', 'second'])
         #id real, app text, path text, ip text, server text, timestamp text
         conn = sqlite3.connect('browser_settings/browser_history.db')
-        conn.execute("INSERT INTO history VALUES (?, ?, ?, ?, ?)", [_max_history_id(), url.app_name, url.path, site_obj.ip, url.server, timestamp])
+        conn.execute("INSERT INTO history VALUES (?, ?, ?, ?, ?, ?)", [_max_history_id(), url.app_name, url.path, site_obj.ip, url.server, timestamp])
         conn.commit()
         conn.close()
         return f(site_obj, url, _tab, request_type, update=update, forms=forms)
@@ -172,7 +196,7 @@ def log_view(_f:typing.Callable) -> typing.Callable:
         d = datetime.datetime.now()
         _timestamp = '-'.join(str(getattr(d, i)) for i in ['month', 'day', 'year']) + ' '+':'.join(str(getattr(d, i)) for i in ['hour', 'minute', 'second'])
         conn = sqlite3.connect(f'apps/app_{_payload["app"]}/__views__.db')
-        conn.execute("INSERT INTO views VALUES (?, ?, ?, ?, ?, ?)", [_timestamp, _payload['ip'], _payload['sender'], _payload['path'], _payload['server']])
+        conn.execute("INSERT INTO views VALUES (?, ?, ?, ?, ?)", [_timestamp, _payload['ip'], _payload['sender'], _payload['path'], _payload['server']])
         conn.commit()
         conn.close()
         return _f(_payload)
@@ -182,3 +206,45 @@ def get_attrs(_f:typing.Callable) -> typing.Callable:
     def _wrapper(_url_obj, _response_obj):
         return _f(_url_obj._original_url, _response_obj['route'])
     return _wrapper
+
+class jNetHistory:
+    headers = ['id', 'app', 'path', 'ip', 'server', 'timestamp']
+    class jnetHistoryItem:
+        def __init__(self, _row:typing.List[str]) -> None:
+            self.__dict__ = dict(zip(jNetHistory.headers, _row))
+        @property
+        def jnet_url(self):
+            return str(self)
+        @staticmethod
+        def day_stamp(_obj:datetime.datetime) -> str:
+            return 'Today' if not getattr(_obj, 'days', None) else 'Yesterday' if _obj.days == 1 else None
+        @staticmethod
+        def calc_timestamp(*args) -> str:
+            _h, _m, _s = args
+            return f'{_h%12}:{_m.zfill(2)} {"PM" if _h >= 12 else "AM"}'
+        @property
+        def day_occured(self):
+            _mdy, _hms = self.timestamp.split()
+            _m, _d, _y = map(int, re.findall('\d+', _mdy))
+            _h, _min, _s = map(int, re.findall('\d+', _hms))
+            _day_format = self.__class__.day_stamp(datetime.datetime.now() - datetime.datetime(_y, _m, _d, _h, _min, _s))
+            return f'{_day_format if _day_format is not None else _mdy} at {self.__class__.calc_timestamp(_h, _min, _s)}'
+        def __repr__(self):
+            return f'<history_item({self.id}) jnet_url = {str(self)} timestamp={self.day_occured}>'
+
+        def __contains__(self, _keyword:str) -> bool:
+            return _keyword in str(self)
+        def __str__(self) -> str:
+            return f'{self.server}:@{self.app}{self.path}'
+    def __init__(self, _content:typing.List[list]) -> None:
+        self._content = _content
+    def __bool__(self):
+        return bool(self._content)
+    def __iter__(self):
+        yield from self._content
+    @classmethod
+    def get_history(cls, _filter_keyword = ''):
+        _content = list(sqlite3.connect('browser_settings/browser_history.db').cursor().execute("SELECT * FROM history"))
+        _all_contents = [cls.jnetHistoryItem(i) for i in _content]
+        return cls(list(filter(lambda x:_filter_keyword in x, _all_contents)))
+    
