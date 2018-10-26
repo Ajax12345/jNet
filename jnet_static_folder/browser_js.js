@@ -2,7 +2,14 @@ async function filter_browser_history(substring){
   let new_history_content = await eel.filter_browser_history(substring)();
   $('.__history_listing_canvas__').html(new_history_content);
 }
+async function delete_selected_history(delete_ids){
+  let result = await eel.delete_selected_history(delete_ids)();
 
+}
+
+async function delete_all_history(){
+  let result = await eel.delete_all_history()();
+}
 async function display_browsing_history(){
   let history_content = await eel.get_browser_history()();
   $('.content_place').html(history_content);
@@ -299,6 +306,7 @@ async function update_browser_owner_display(){
     $('.__delete_all__').css('display', 'none');
     $('.__no_history__').html('<div class="__spacer__" style="height:80px;"></div>\n<p><strong>No browser history</strong></p>')
     $('.__delete_selected__').css('display', 'none');
+    delete_all_history();
   });
   $('.content_place').on('click', '.__select_delete__', function(){
 
@@ -343,6 +351,7 @@ async function update_browser_owner_display(){
         $('.__no_history__').html('<div class="__spacer__" style="height:80px;"></div>\n<p><strong>No browser history</strong></p>')
 
       }
+      delete_selected_history(JSON.stringify(to_delete));
 
   });
   $('.content_place').on('input', '.__filter_history__', function(){
