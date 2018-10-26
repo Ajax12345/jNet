@@ -7,10 +7,13 @@ import socket, requests
 from bs4 import BeautifulSoup as soup
 import contextlib, typing, json
 import jnet_utilities, jnet_connectors
-import on_connection_action
+import on_connection_actions
 
 #NOTE: will need to adjust recv_size in interal_morpheus
-
+#TODO: build local routing object under the "jnet-browser" server
+#TODO: create program to detect HTML id and class names that are not valid. Build a feature in app page to scan app source for such keywords
+#TODO: for all id and classnames in browser_window.html, add "__" at the end of each
+#TODO: build scanner anyway
 eel.init('jnet_static_folder')
 
 class TaskManager:
@@ -110,10 +113,13 @@ def testing():
 def get_full_username():
     return jnet_utilities.get_full_username()
 
-
 @eel.expose
 def get_home_search():
     return open('jnet_static_folder/home_search_bar.html').read()
+@eel.expose
+def get_browser_history(keyword=''):
+    return jnet_utilities.jNetHistory.render_history(keyword=keyword)
+
 #eel.start('main_window.html')
 
 eel.start('browser_window.html')
