@@ -125,6 +125,16 @@ def get_browser_history():
 def filter_browser_history(keyword):
     return jnet_utilities.jNetHistory.render_filter_history(keyword)
 
+@eel.expose
+def delete_selected_history(deletion_ids):
+    jnet_utilities.delete_history(_ids = [int(i) for [i] in json.loads(deletion_ids)])
+    return 'done'
+    
+@eel.expose
+def delete_all_history():
+    jnet_utilities.delete_history(by_id=True)
+    return 'done'
+
 #eel.start('main_window.html')
 
 eel.start('browser_window.html')
