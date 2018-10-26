@@ -1,3 +1,9 @@
+
+async function display_browsing_history(){
+  let history_content = await eel.get_browser_history()();
+  $('.content_place').html(history_content);
+}
+
 function get_max(arr){
     var start = arr[0];
     for (var i = 0; i < arr.length; i++){
@@ -23,7 +29,7 @@ function get_max(arr){
 var current_data = "";
 async function update_browser_owner_display(){
   let username = await eel.get_full_username()();
-  $('.signin').html(username);
+  $('.__signin__').html(username);
   let body_search_content = await eel.get_home_search()();
   $('.content_place').append(body_search_content);
 }
@@ -76,7 +82,7 @@ async function update_browser_owner_display(){
     var just_removed = false;
     var original_headers = {0:["Home"]};
     $('.main_action_wrapper').on('click', '.add_tab', function(){
-  
+      $('.url_input').val('jnet:@');
       var current_tabs = [];
       $('.tab').each(function(){
         current_tabs.push(parseInt(this.id.match('\\d+')));
@@ -124,6 +130,7 @@ async function update_browser_owner_display(){
         $('#tab'+current_tabs[i].toString()).css('background-color', '#C0C0C0');
         $('#tab'+current_tabs[i].toString()).css('border-right', 'none');
       }
+      
   
     });
   
@@ -276,5 +283,62 @@ async function update_browser_owner_display(){
       {
         $('.main_input').append("<button class='setup_button next_action'>Next</button>");
       }, 500)
+  });
+  $('.browser_input').on('click', '.__signin__', function(){
+    display_browsing_history();
+  });
+  $('.content_place').on('click', '.__delete_all__', function(){
+
+    $('.__history_item__').each(function(){
+      $('#__listing_'+this.id.match('\\d+')+'__').remove();
+    });
+    $('.__delete_all__').css('display', 'none');
+    $('.__no_history__').html('<div class="__spacer__" style="height:80px;"></div>\n<p><strong>No browser history</strong></p>')
+    $('.__delete_selected__').css('display', 'none');
+  });
+  $('.content_place').on('click', '.__select_delete__', function(){
+
+    var flag = false;
+    $('.__select_delete__').each(function(){
+      if ($(this).is(":checked")){
+        flag = true;
+
+      }
+    });
+    if (flag){
+      $('.__delete_selected__').css('display', 'block');
+    }
+    else{
+      $('.__delete_selected__').css('display', 'none');
+    }
+  });
+  $('.content_place').on('click', '.__delete_selected__', function(){
+  
+      var to_delete = [];
+      $('.__select_delete__').each(function(){
+        if ($(this).is(":checked")){
+          to_delete.push(this.id.match('\\d+'));
+        }
+        
+
+      });
+      var deletion_count = 0
+      for (var i = 0; i < to_delete.length; i++){
+        $('#__listing_'+to_delete[i]+'__').remove();
+        deletion_count += 1;
+
+      }
+      $('.__delete_selected__').css('display', 'none');
+      var count = 0;
+      $('.__history_item__').each(function(){
+        count += 1;
+      });
+      if (count === 0){
+        $('.__delete_all__').css('display', 'none');
+
+        $('.__no_history__').html('<div class="__spacer__" style="height:80px;"></div>\n<p><strong>No browser history</strong></p>')
+
+      }
+
   });
 });
