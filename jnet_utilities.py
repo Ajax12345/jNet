@@ -251,3 +251,6 @@ class jNetHistory:
     @classmethod
     def render_history(cls, keyword = ''):
         return jinja2.Template(open('jnet_static_folder/browser_history_listing.html').read()).render(history = cls.get_history(_filter_keyword = keyword))
+    @classmethod
+    def render_filter_history(cls, keyword):
+        return jinja2.Template(open('jnet_static_folder/browser_filter_history_results.html').read()).render(history = cls.get_history(_filter_keyword = keyword))
