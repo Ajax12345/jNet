@@ -207,6 +207,15 @@ def get_attrs(_f:typing.Callable) -> typing.Callable:
         return _f(_url_obj._original_url, _response_obj['route'])
     return _wrapper
 
+def delete_history(_ids = None, by_id = False):
+    conn = sqlite3.connect('browser_settings/browser_history.db')
+    if not by_id:
+        conn.executemany("DELETE FROM history WHERE id=?", [[i] for i in _ids])
+    else:
+        conn.execute("DELETE FROM history")
+    conn.commit()
+    conn.close()
+    
 class jNetHistory:
     headers = ['id', 'app', 'path', 'ip', 'server', 'timestamp']
     class jnetHistoryItem:
