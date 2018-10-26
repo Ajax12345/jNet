@@ -1,3 +1,7 @@
+async function filter_browser_history(substring){
+  let new_history_content = await eel.filter_browser_history(substring)();
+  $('.__history_listing_canvas__').html(new_history_content);
+}
 
 async function display_browsing_history(){
   let history_content = await eel.get_browser_history()();
@@ -340,5 +344,8 @@ async function update_browser_owner_display(){
 
       }
 
+  });
+  $('.content_place').on('input', '.__filter_history__', function(){
+    filter_browser_history($('.__filter_history__').val());
   });
 });
