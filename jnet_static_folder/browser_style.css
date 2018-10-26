@@ -298,6 +298,7 @@ body{
     width:560px;
     height:40px;
     border-radius:20px;
+    padding-left:10px;
     border:solid;
     border-width:1.7px;
     border-color:#FF8C00;
@@ -312,3 +313,162 @@ body{
     font-size:14px;
     color:gray;
   }
+
+  .__href__{
+    font-family: 'Istok Web', sans-serif;
+    color:blue;
+    text-decoration: underline;
+    display:inline-block;
+  }
+  .__href__:hover{
+    background-color: #91C7ED;
+  }
+  .__column__ {
+    float: left;
+    width: 33.33%;
+
+
+}
+
+/* Clear floats after the columns */
+
+  .__row__:after {
+      content: "";
+      display: table;
+      clear: both;
+      padding-bottom: 8px;
+  }
+    .__history_header__{
+      margin-top:-2px;
+      font-family: 'Istok Web', sans-serif;
+      text-align: left;
+      font-size:19px;
+
+
+    }
+    #__jnet_browser_history__{
+      text-align: center;
+      height:100%;
+    }
+    .__filter_history__{
+      width:600px;
+      height:45px;
+      font-family: 'Istok Web', sans-serif;
+      font-size:18px;
+      border-radius: 20px;
+      border:solid;
+      border-width:1px;
+      border-color:#FF8C00;
+      padding-left:15px;
+    }
+    .__filter_history__:focus{
+      outline:none;
+    }
+    .__margin-spacer__{
+      background-color: #FF8C00;
+      height:1px;
+      width:auto;
+    }
+    .__history_listing__{
+      margin:0 auto;
+      width:800px;
+      text-align: center;
+    }
+    .__delete_all__{
+      margin-left:auto;
+      background: none;
+      padding:7px;
+      border:solid;
+      border-width:1.6px;
+      border-color:white;
+      font-family: 'Istok Web', sans-serif;
+      font-size:16px;
+
+
+    }
+    .__delete_all__:focus{
+
+    }
+    .__delete_all__:hover{
+      color:white;
+      border:solid;
+      border-radius:8px;
+      padding:7px;
+      border-color:#FF8C00;
+      border-width:1.6px;
+      background-color:#FF8C00;
+
+
+    }
+    .__delete_selected__{
+      display: none;
+      margin-left:auto;
+      background: none;
+      padding:7px;
+      border:solid;
+      border-width:1.6px;
+      border-color:white;
+      font-family: 'Istok Web', sans-serif;
+      font-size:16px;
+    }
+    .__delete_selected__:hover{
+      color:white;
+      border:solid;
+      border-radius:8px;
+      padding:7px;
+      border-color:#FF8C00;
+      border-width:1.6px;
+      background-color:#FF8C00;
+
+    }
+    .__history_item__{
+
+      margin:0 auto;
+      width:760px;
+      height:70px;
+      border:none;
+      border-bottom:solid;
+      border-bottom-width:2px;
+      border-bottom-color:#FF8C00;
+
+
+    }
+
+    .__select_delete__{
+
+    }
+    .__history_timestamp__{
+      font-family: 'Istok Web', sans-serif;
+    }
+    .__no_history__{
+      font-family: 'Istok Web', sans-serif;
+      font-size:20px;
+    }
+    .__extra_info__{
+      margin-top:-7px;
+      text-align: left;
+      border-left:solid;
+      border-left-width:1px;
+      border-left-color:#FF8C00;
+      border-bottom:solid;
+      border-bottom-width:1px;
+      border-bottom-color:#FF8C00;
+      width:300px;
+      margin-left:50px;
+      display:none;
+
+    }
+    .__extra_text__{
+      font-family: 'Istok Web', sans-serif;
+    }
+    .__history_listing_canvas__{
+      -webkit-box-shadow: 2px 4px 12px -4px rgba(0,0,0,0.75);
+      -moz-box-shadow: 2px 4px 12px -4px rgba(0,0,0,0.75);
+      box-shadow: 2px 4px 12px -4px rgba(0,0,0,0.75);
+      width:860px;
+      padding:40px;
+      padding-top:1px;
+      border-radius:6px;
+      background-color: #EAEAEA;
+
+    }
