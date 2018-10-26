@@ -1,0 +1,48 @@
+<div id='__jnet_browser_history__'>
+        <div class='__spacer__' style='height:10px;'></div>
+    <input type='text' class='__filter_history__' placeholder="Search history">
+    <div class='__spacer__' style='height:20px;'></div>
+
+    <div class='__history_listing__'>
+
+      <table style='float:left'>
+        <tr>
+        {%if history%}
+          <td><button class='__delete_all__'><strong>Delete all</strong></button></td>
+         {%endif%}
+          <td><button class='__delete_selected__'><strong>Delete Selected</strong></button></td>
+        </tr>
+      </table>
+      <div class='__spacer__' style='height:50px;'></div>
+      <div class='__history_listing_canvas__'>
+        {%if not history%}
+            <div class='__no_history__'>
+                    <div class="__spacer__" style="height:80px;"></div>
+                    <p><strong>No browser history</strong></p>
+
+            </div>
+        {%else%}
+        <div class='__no_history__'></div>
+        {%endif%}
+        {%for row in history%}
+        <div id='__listing_{{row.id}}__' class='__history_item__'>
+          <div class='__spacer__' style='height:20px;'></div>
+          <div class='row' style='padding-left:10px;'>
+
+                <div class='col-md-auto'>
+                  <input type='checkbox' class='__select_delete__' id='__select{{row.id}}__'>
+
+                </div>
+                <div class='col'>
+                  <p class='__href__ __jnetsitehref__' data-link='{{row.jnet_url}}' data-tab='true'>{{row.jnet_url}}<p>
+                </div>
+                <div class='col'>
+                  <p class='__history_timestamp__'><strong>{{row.day_occured}}</strong></p>
+                </div>
+
+          </div>
+        </div>
+        {%endfor%}
+      </div>
+    </div>
+  </div>
