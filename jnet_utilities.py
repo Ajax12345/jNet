@@ -3,7 +3,7 @@ import re, platform, warnings, json
 import datetime, contextlib, sqlite3
 import typing, tigerSqlite
 import multiprocessing, itertools
-import time, os
+import time, os, jinja2
 
 def test_passcode(_code:str) -> bool:
     '''only supported on Darwin'''
@@ -212,6 +212,7 @@ class jNetHistory:
     class jnetHistoryItem:
         def __init__(self, _row:typing.List[str]) -> None:
             self.__dict__ = dict(zip(jNetHistory.headers, _row))
+            self.id = int(self.id)
         @property
         def jnet_url(self):
             return str(self)
@@ -221,7 +222,7 @@ class jNetHistory:
         @staticmethod
         def calc_timestamp(*args) -> str:
             _h, _m, _s = args
-            return f'{_h%12}:{_m.zfill(2)} {"PM" if _h >= 12 else "AM"}'
+            return f'{_h%12}:{str(_m).zfill(2)} {"PM" if _h >= 12 else "AM"}'
         @property
         def day_occured(self):
             _mdy, _hms = self.timestamp.split()
@@ -247,4 +248,6 @@ class jNetHistory:
         _content = list(sqlite3.connect('browser_settings/browser_history.db').cursor().execute("SELECT * FROM history"))
         _all_contents = [cls.jnetHistoryItem(i) for i in _content]
         return cls(list(filter(lambda x:_filter_keyword in x, _all_contents)))
-    
+    @classmethod
+    def render_history(cls, keyword = ''):
+        return jinja2.Template(open('jnet_static_folder/browser_history_listing.html').read()).render(history = cls.get_history(_filter_keyword = keyword))
