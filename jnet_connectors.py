@@ -174,13 +174,13 @@ def request_site_data(site_lookup, parsed_url, _tab_info, request_response_type,
 
     with open('jnet_static_folder/on_response.html', 'w') as f:
         f.write(_server_result['payload']['html'])
-    if _server_result['payload']['js']:
-        with open('jnet_static_folder/on_response.js', 'w') as f:
-            f.write(_server_result['payload']['js'])
+    
+    with open('jnet_static_folder/on_response.js', 'w') as f:
+        f.write(_server_result['payload']['js'] if _server_result['payload']['js'] else '')
         
-    if _server_result['payload']['css']:
-        with open('jnet_static_folder/on_response.css', 'w') as f:
-            f.write(_server_result['payload']['css'])
+    
+    with open('jnet_static_folder/on_response.css', 'w') as f:
+        f.write(_server_result['payload']['css'] if _server_result['payload']['css'] else '')
 
     if update:
         tigerSqlite.Sqlite('browser_settings/browser_tabs.db').update('tabs', [['ip', site_lookup.ip], ['app', parsed_url.app_name], ['url', BrowserResponse.join_path(parsed_url, _server_result)], ['path', _server_result['route']], ['session', _server_result['session']]], [['num', _tab_info.tabid]])
