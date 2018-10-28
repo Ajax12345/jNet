@@ -215,6 +215,11 @@ def delete_history(_ids = None, by_id = False):
         conn.execute("DELETE FROM history")
     conn.commit()
     conn.close()
+
+def jsonify_result(f):
+    def _wrapper(*args, **kwargs):
+        return json.dumps(f(*args, **kwargs))
+    return _wrapper
     
 class jNetHistory:
     headers = ['id', 'app', 'path', 'ip', 'server', 'timestamp']
