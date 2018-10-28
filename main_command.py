@@ -129,12 +129,21 @@ def filter_browser_history(keyword):
 def delete_selected_history(deletion_ids):
     jnet_utilities.delete_history(_ids = [int(i) for [i] in json.loads(deletion_ids)])
     return 'done'
-    
+
 @eel.expose
 def delete_all_history():
     jnet_utilities.delete_history(by_id=True)
     return 'done'
 
+@eel.expose
+def accept_query(jnet_url, _tab):
+    _parsed = jnet_connectors.jNetUrl(jnet_url)
+    if _parsed.server == 'jnet-browser':
+        _full_result = jnet_connectors.jnet_browser_url(_parsed, _tab)
+        print('full result', _full_result)
+        return _full_result
+    return 
+    
 #eel.start('main_window.html')
 
 eel.start('browser_window.html')
