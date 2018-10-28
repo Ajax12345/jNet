@@ -6,6 +6,21 @@ async function delete_selected_history(delete_ids){
   let result = await eel.delete_selected_history(delete_ids)();
 
 }
+async function get_jnet_url(url_input){
+  var the_current_tab = 0;
+  $('.tab').each(function(){
+    if ($(this).css('background-color') === 'rgb(222, 222, 222)'){
+      the_current_tab = parseInt(this.id.match('\\d+'));
+    }
+  });
+
+  let full_json = await eel.accept_query(url_input, the_current_tab)();
+  var returned_content = JSON.parse(full_json);
+  if (returned_content['is_redirect']){
+    $('.url_input').val(returned_content['route']);
+  }
+  $('.content_place').html(returned_content['html']);
+}
 
 async function delete_all_history(){
   let result = await eel.delete_all_history()();
@@ -297,6 +312,13 @@ async function update_browser_owner_display(){
   });
   $('.browser_input').on('click', '.__signin__', function(){
     display_browsing_history();
+    $('.url_input').val('jnet-browser:@history')
+
+  });
+  $('.browser_input').on('keydown', '.url_input', function(_key){
+    if (_key.keyCode == 13){
+      get_jnet_url($('.url_input').val());
+    }
   });
   $('.content_place').on('click', '.__delete_all__', function(){
 
