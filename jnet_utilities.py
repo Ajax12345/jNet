@@ -211,10 +211,13 @@ def delete_history(_ids = None, by_id = False):
     conn = sqlite3.connect('browser_settings/browser_history.db')
     if not by_id:
         conn.executemany("DELETE FROM history WHERE id=?", [[i] for i in _ids])
+
     else:
         conn.execute("DELETE FROM history")
     conn.commit()
     conn.close()
+    for a, b in tigerSqlite.Sqlite('browser_settings/browser_tab_history.db').get_id_tabs('tab_history'):
+        tigerSqlite.Sqlite('browser_settings/browser_tab_history.db').update('tab_history', [['tabs', [] if by_id else [i for i in b if i['id'] not in _ids]]], [['id', a]])
 
 def jsonify_result(f):
     def _wrapper(*args, **kwargs):
