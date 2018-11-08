@@ -223,7 +223,28 @@ def jsonify_result(f):
     def _wrapper(*args, **kwargs):
         return json.dumps(f(*args, **kwargs))
     return _wrapper
+ 
     
+    
+    
+def time_query(_isinstance=True):
+    def _func_wrapper(f):
+        def _time_results(_f, args:list, kwargs:dict) -> typing.Tuple[float, typing.Any]:
+            _start = time.time()
+            _result = _f(*args, **kwargs)
+            return [time.time()-_start, _result]
+
+        if _isinstance:
+            def _wrapper(_cls, *args, **kwargs) -> typing.Any:
+                _time, _returned_result = _time_results(f, [_cls, *args], kwargs)
+                return _cls(_time, *args, _returned_result, **kwargs)
+        else:
+            def _wrapper(*args, **kwargs) -> typing.Any:
+                return _time_results(f, args, kwargs)
+        return _wrapper
+    return _func_wrapper
+
+
 class jNetHistory:
     headers = ['id', 'app', 'path', 'ip', 'server', 'timestamp']
     class jnetHistoryItem:
