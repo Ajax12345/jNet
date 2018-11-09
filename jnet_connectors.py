@@ -41,7 +41,7 @@ class BrowserResponse:
     @classmethod
     def _to_browser_response(cls, server_response_type, _returned_payload:dict, on_error = False) -> typing.Callable:
         print('returned payload here', _returned_payload)
-        if server_response_type == 'json':
+        if server_response_type() == 'json':
             return cls(server_response_type, **{'isredirect':_returned_payload['is_redirect'], 'route':_returned_payload['route'], 'payload':_returned_payload['payload']})
         return cls(server_response_type, **({'payload':ReadFrom(html='url_name_error.html', js=None, css=None), 'is_error':True} if on_error else {'isredirect':_returned_payload['is_redirect'], 'route':_returned_payload['route'], 'payload':ReadFrom(html='on_response.html', js=_returned_payload['payload']['js'], css=_returned_payload['payload']['css'])}))
         #ReadFrom(html='on_response.html', js=_server_result['js'], css=_server_result['css'])
@@ -165,7 +165,7 @@ def request_site_data(site_lookup, parsed_url, _tab_info, request_response_type,
         return {'status':'url name error'.replace(' ', '_').upper()}
     
     print('request_response_type here', request_response_type)
-    if request_response_type == 'json':
+    if request_response_type() == 'json':
         print('got in json here')
         if update:
             tigerSqlite.Sqlite('browser_settings/browser_tabs.db').update('tabs', [['ip', site_lookup.ip], ['app', parsed_url.app_name], ['url', BrowserResponse.join_path(parsed_url, _server_result)], ['path', _server_result['route']], ['session', _server_result['session']]], [['num', _tab_info.tabid]])
@@ -197,13 +197,11 @@ def get_site_resources(tab:int, url:str, request_response_type, forms={}) -> typ
     _tab = jnet_utilities.find_tab(tab)
     current_site, parsed = lookup_site(url)
     if isinstance(current_site, ErrorSiteLookup) or not current_site.found:
-        if request_response_type == 'env':
-            with open('jnet_static_folder/url_name_error.html', 'w') as f:
-                f.write(open('jnet_static_folder/url_name_error_template.html').read().format(url))
+        if _tab:
+            #[['ip', None], ['app', None], ['url', 'url'], ['path', None], ['session', {}]]
+            tigerSqlite.Sqlite('browser_settings/browser_tabs.db').update('tabs', [['ip', None], ['app', None], ['url', url], ['path', None], ['session', {}]], [['num', tab]])
+        else:
             tigerSqlite.Sqlite('browser_settings/browser_tabs.db').insert('tabs', ('num', tab), ('ip', None), ('app', None), ('url', url), ('path', None), ('session', {}))
-            return ReadFrom(html='url_name_error.html', js=None, css=None)
-            #num real, ip text, app text, url text, path text, session text
-        tigerSqlite.Sqlite('browser_settings/browser_tabs.db').insert('tabs', ('num', tab), ('ip', None), ('app', None), ('url', url), ('path', None), ('session', {}))
         return {'status':'url name error'.replace(' ', '_').upper()}
         
     return request_site_data(current_site, parsed, _tab, request_response_type, update=bool(_tab), forms=forms)
@@ -212,14 +210,16 @@ def get_site_resources(tab:int, url:str, request_response_type, forms={}) -> typ
 def lookup_tab(tab:int, request_response_type, forms={}) -> typing.Callable:
     _tab = jnet_utilities.find_tab(tab)
     if not any(getattr(_tab, i) for i in ['siteip', 'appname', 'path']):
-        if request_response_type == 'env':
-            with open('jnet_static_folder/url_name_error.html', 'w') as f:
-                f.write(open('jnet_static_folder/url_name_error_template.html').read().format(_tab.url))
-            return ReadFrom(html='url_name_error.html', js=None, css=None)
         return {'status':'url name error'.replace(' ', '_').upper()}
     return get_site_resources(tab, _tab.url, request_response_type, forms=forms)
 
  
+def catch_invalid_response(f):
+    def wrapper(_inst, _time, _tab, _url, _, _response_obj):
+        if isinstance(_response_obj, dict):
+            pass
+        return f(_inst, _time, _tab, _url, _, _response_obj)
+    return wrapper
 
 @jnet_utilities.log_history
 @jnet_utilities.log_tab_history
@@ -240,3 +240,21 @@ def jnet_browser_url(_url_parsed:jNetUrl, _tab:int):
             return 'N/A'
     _t = jnet_utilities.find_tab(_tab)
     return browser_app_connector(_site_obj(), _url_parsed, _t, ResponseTypes.jNetEnv, update=bool(_t), forms={})
+
+
+class _NewBrowserQuery:
+    @catch_invalid_response
+    def __init__(self, _time_completed:float, _tab:int, _url:str, _, _response_obj:BrowserResponse) -> None:
+        self._time_completed, self.tab, self.url = _time_completed, _tab, _url
+        self.response_obj = _response_obj
+    @property
+    @jnet_utilities.jsonify_result
+    def jsonify(self):
+        if isinstance(self.response_obj, dict) or self.response_obj.response_type() == 'json':
+            return {'route':self.url, 'is_redirect':False if isinstance(self.response_obj, dict) else self.response_obj.isredirect, 'html':open(f'jnet_static_folder/{"url_name_error_template.html" if isinstance(self.response_obj, dict) else "invalid_response_error_template.html"}').read().format(self.url)}
+        return {'route':self.url, 'is_redirect':False if isinstance(self.response_obj, dict) else self.response_obj.isredirect, **{i:open(f'jnet_static_folder/on_response.{i}').read() if i == 'html' else f'jnet_static_folder/on_response.{i}' for i in ['html', 'js', 'css'] if hasattr(self.response_obj.payload, i) and getattr(self.response_obj.payload, i)}}
+    @classmethod
+    @jnet_utilities.time_query()
+    def accept_query(cls, _tab:int, _url:str, _forms) -> typing.Callable:
+        return get_site_resources(_tab, _url, ResponseTypes.jNetEnv, forms=_forms)
+    
