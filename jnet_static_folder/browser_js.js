@@ -379,4 +379,19 @@ async function update_browser_owner_display(){
   $('.content_place').on('input', '.__filter_history__', function(){
     filter_browser_history($('.__filter_history__').val());
   });
+  $('.content_place').on('click', '.__href__', function(){
+    var url = this.dataset.link;
+    var datasettab = this.dataset.tab;
+    if (url ===undefined || datasettab === undefined){
+      get_jnet_url($(this).text());
+    }
+    else{
+      if (datasettab === "true"){
+        get_jnet_url(url);
+      }
+      else{
+        get_jnet_url($(this).text());
+      }
+    }
+  });
 });
