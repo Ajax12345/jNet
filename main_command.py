@@ -14,6 +14,12 @@ import on_connection_actions
 #TODO: create program to detect HTML id and class names that are not valid. Build a feature in app page to scan app source for such keywords
 #TODO: for all id and classnames in browser_window.html, add "__" at the end of each
 #TODO: build scanner anyway
+#UPDATED: jnet_utilities.py, jnet_connectors.py
+#TODO: cache tab content
+#TODO: update app creation function to include server hosting of app
+#TODO: add the ability to update internal server listing
+#UPDATED on 11/11/18 (must be uploaded to Github):
+#TODO: build form posting with element data attributes
 eel.init('jnet_static_folder')
 
 class TaskManager:
@@ -136,14 +142,38 @@ def delete_all_history():
     return 'done'
 
 @eel.expose
+def get_app_listing():
+    return open('jnet_static_folder/full_app_listing.html').read()
+
+@eel.expose
 def accept_query(jnet_url, _tab):
     _parsed = jnet_connectors.jNetUrl(jnet_url)
     if _parsed.server == 'jnet-browser':
         _full_result = jnet_connectors.jnet_browser_url(_parsed, _tab)
         print('full result', _full_result)
         return _full_result
-    return 
-    
-#eel.start('main_window.html')
+    return jnet_connectors._NewBrowserQuery.accept_query(_tab, jnet_url, {}).jsonify
 
+
+@eel.expose
+def accept_query_form(jnet_url, _tab, _form):
+    _parsed = jnet_connectors.jNetUrl(jnet_url)
+    if _parsed.server == 'jnet-browser':
+        _full_result = jnet_connectors.jnet_browser_url(_parsed, int(_tab), _forms=json.loads(_form))
+        print('in form query, ', _full_result)
+        return _full_result
+    return 
+
+@eel.expose
+def accept_dynamic_query_form(jnet_url, _tab, _form):
+    _parsed = jnet_connectors.jNetUrl(jnet_url)
+    if _parsed.server == 'jnet-browser':
+        _result = jnet_connectors.jnet_dynamic_url(_parsed, int(_tab), _forms=_form)
+        print('for app creation ', type(_result))
+        return _result
+
+
+
+
+#eel.start('main_window.html')
 eel.start('browser_window.html')
