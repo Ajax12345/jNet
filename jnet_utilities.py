@@ -44,6 +44,9 @@ def mute(f):
     return lambda *args, **kwargs:None
 
 
+def app_exists(_name:str) -> bool:
+    return any(_name == re.sub('^app_', '', i) for i in os.listdir('apps'))
+
 @contextlib.contextmanager
 def add_server_hosting(name:str, _url:str):
     conn = sqlite3.connect('browser_settings/server_hostings.db')
@@ -156,12 +159,12 @@ def terminate_delay(_time):
     return _wrapper
 
 
-def create_app(_name:str) -> None:
+def create_app(_name:str, _description, _host:str) -> None:
     d = datetime.datetime.now()
     _ = os.system(f'mkdir apps/app_{_name}')
     _timestamp = '-'.join(str(getattr(d, i)) for i in ['month', 'day', 'year'])+' '+':'.join(str(getattr(d, i)) for i in ['hour', 'minute', 'second'])
     with open(f'apps/app_{_name}/app_config.json', 'w') as f:
-        json.dump({'live':False, 'created_on':[getattr(d, i) for i in ['year', 'month', 'day', 'hour', 'minute', 'second']]}, f)
+        json.dump({'live':False, 'created_on':[getattr(d, i) for i in ['year', 'month', 'day', 'hour', 'minute', 'second']], 'description':_description, 'host':_host}, f)
     
     _ = os.system(f'mkdir apps/app_{_name}/templates')
     with open(f'apps/app_{_name}/templates/home.html', 'w') as f:
@@ -188,6 +191,32 @@ def create_app(_name:str) -> None:
     conn.execute("CREATE TABLE views (timestamp text, ip text, visitor text, path text, server text)")
     conn.commit()
     conn.close()
+
+
+
+def browser_app_listing() -> set:
+    return {re.sub('^browser_app_|\.py$', '', i) for i in os.listdir(os.getcwd()) if re.findall('^browser_app_', i)}
+
+def added_jnet_servers() -> typing.List[str]:
+    return [a for a, *_ in sqlite3.connect('browser_settings/server_hostings.db').cursor().execute("SELECT name FROM servers")]
+
+def time_query(_isinstance=True):
+    def _func_wrapper(f):
+        def _time_results(_f, args:list, kwargs:dict) -> typing.Tuple[float, typing.Any]:
+            _start = time.time()
+            _result = _f(*args, **kwargs)
+            return [time.time()-_start, _result]
+
+        if _isinstance:
+            def _wrapper(_cls, *args, **kwargs) -> typing.Any:
+                _time, _returned_result = _time_results(f, [_cls, *args], kwargs)
+                return _cls(_time, *args, _returned_result, **kwargs)
+        else:
+            def _wrapper(*args, **kwargs) -> typing.Any:
+                return _time_results(f, args, kwargs)
+        return _wrapper
+    return _func_wrapper
+
 
 
 def log_view(_f:typing.Callable) -> typing.Callable:
@@ -223,27 +252,20 @@ def jsonify_result(f):
     def _wrapper(*args, **kwargs):
         return json.dumps(f(*args, **kwargs))
     return _wrapper
- 
-    
-    
-    
-def time_query(_isinstance=True):
-    def _func_wrapper(f):
-        def _time_results(_f, args:list, kwargs:dict) -> typing.Tuple[float, typing.Any]:
-            _start = time.time()
-            _result = _f(*args, **kwargs)
-            return [time.time()-_start, _result]
 
-        if _isinstance:
-            def _wrapper(_cls, *args, **kwargs) -> typing.Any:
-                _time, _returned_result = _time_results(f, [_cls, *args], kwargs)
-                return _cls(_time, *args, _returned_result, **kwargs)
+
+def cache_request_response(f):
+    #_time_completed:float, _tab:int, _url:str, _, _response_obj:BrowserResponse
+    def _wrapper(_inst, *args):
+        _t =  f(_inst, *args)
+        #print('for val in cached ', _t, type(_t))
+        #num real, url text, html text, css text, js text
+        if any(int(c) == _inst.tab for c, *_ in sqlite3.connect('browser_settings/cached_tabs.db').cursor().execute("SELECT * FROM cached_tabs")):
+            tigerSqlite.Sqlite('browser_settings/cached_tabs.db').update('cached_tabs', [['url', _inst.url]]+[[i, _t[i] if i == 'html' else '' if i not in _t else open(f'jnet_static_folder/on_response.{i}').read()] for i in ['html', 'css', 'js']], [['num', _inst.tab]])
         else:
-            def _wrapper(*args, **kwargs) -> typing.Any:
-                return _time_results(f, args, kwargs)
-        return _wrapper
-    return _func_wrapper
-
+            tigerSqlite.Sqlite('browser_settings/cached_tabs.db').insert('cached_tabs', ('num', _inst.tab), ('url', _inst.url), *[(i, _t[i] if i == 'html' else '' if i not in _t else open(f'jnet_static_folder/on_response.{i}').read()) for i in ['html', 'css', 'js']])
+        return _t
+    return _wrapper
 
 class jNetHistory:
     headers = ['id', 'app', 'path', 'ip', 'server', 'timestamp']
