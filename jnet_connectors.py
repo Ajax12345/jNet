@@ -70,8 +70,8 @@ class ServerLookupResponse:
 class jNetUrl:
     def __init__(self, _url:str) -> None:
         self._original_url = _url
-        self.server, self.app_name = re.findall('^[\w\-]+(?=:@)|(?<=@)\w+(?=/)|(?<=@)\w+$', _url)
-        self.path = re.sub('^[\w\-]+:@\w+', '', _url)
+        self.server, self.app_name = re.findall('^[\w\-]+(?=:@)|(?<=@)[\w\-]+(?=/)|(?<=@)\w+$', _url)
+        self.path = re.sub('^[\w\-]+:@[\w\-]+', '', _url)
     def __repr__(self):
         return f'<URL: server={self.server}, appname={self.app_name}, path={self.path}>'
 
@@ -229,17 +229,40 @@ def browser_app_connector(site_lookup, parsed_url, _tab_info, request_response_t
 
     else:
         tigerSqlite.Sqlite('browser_settings/browser_tabs.db').insert('tabs', ('num', _tab_info.tabid), ('ip', site_lookup.ip), ('app', parsed_url.app_name), ('url', parsed_url._original_url), ('path', parsed_url.path), ('session', {}))
-    if parsed_url.app_name not in {'history'}:
+    if parsed_url.app_name not in jnet_utilities.browser_app_listing():
         return {'route':parsed_url._original_url, 'is_redirect':False, 'html':open('jnet_static_folder/url_name_error_template.html').read().format(parsed_url._original_url)}
-    return {'route':parsed_url._original_url, 'is_redirect':False, 'html':importlib.import_module(f'browser_app_{parsed_url.app_name}').app.build(parsed_url.path).content.html}
+    return {'route':parsed_url._original_url, 'is_redirect':False, 'html':importlib.import_module(f'browser_app_{parsed_url.app_name}').app.build(parsed_url.path, _sessions={}, **forms).content.html}
 
 @jnet_utilities.jsonify_result
-def jnet_browser_url(_url_parsed:jNetUrl, _tab:int):
+def jnet_browser_url(_url_parsed:jNetUrl, _tab:int, _forms={}):
     class _site_obj:
         def __getattr__(self, _):
             return 'N/A'
     _t = jnet_utilities.find_tab(_tab)
-    return browser_app_connector(_site_obj(), _url_parsed, _t, ResponseTypes.jNetEnv, update=bool(_t), forms={})
+    return browser_app_connector(_site_obj(), _url_parsed, _t, ResponseTypes.jNetEnv, update=bool(_t), forms=_forms)
+
+
+@jnet_utilities.log_history
+@jnet_utilities.log_tab_history
+def browser_dynamic_app_connector(site_lookup, parsed_url, _tab_info, request_response_type, update=False, forms={}):
+    if update:
+        tigerSqlite.Sqlite('browser_settings/browser_tabs.db').update('tabs', [['ip', site_lookup.ip], ['app', parsed_url.app_name], ['url', parsed_url._original_url], ['path', parsed_url.path], ['session', {}]], [['num', _tab_info.tabid]])
+
+    else:
+        tigerSqlite.Sqlite('browser_settings/browser_tabs.db').insert('tabs', ('num', _tab_info.tabid), ('ip', site_lookup.ip), ('app', parsed_url.app_name), ('url', parsed_url._original_url), ('path', parsed_url.path), ('session', {}))
+    if parsed_url.app_name not in jnet_utilities.browser_app_listing():
+        return {'jnet_jsonify_status':False}
+    return {'jnet_jsonify_status':True, **importlib.import_module(f'browser_app_{parsed_url.app_name}').app.build(parsed_url.path, _sessions={}, **json.loads(forms)).content._jsonified_results}
+
+
+@jnet_utilities.jsonify_result
+def jnet_dynamic_url(_url_parsed:jNetUrl, _tab:int, _forms={}):
+    class _site_obj:
+        def __getattr__(self, _):
+            return 'N/A'
+    _t = jnet_utilities.find_tab(_tab)
+    return browser_dynamic_app_connector(_site_obj(), _url_parsed, _t, ResponseTypes.jNetEnv, update=bool(_t), forms=_forms)
+
 
 
 class _NewBrowserQuery:
@@ -247,12 +270,15 @@ class _NewBrowserQuery:
     def __init__(self, _time_completed:float, _tab:int, _url:str, _, _response_obj:BrowserResponse) -> None:
         self._time_completed, self.tab, self.url = _time_completed, _tab, _url
         self.response_obj = _response_obj
+
     @property
     @jnet_utilities.jsonify_result
+    @jnet_utilities.cache_request_response
     def jsonify(self):
         if isinstance(self.response_obj, dict) or self.response_obj.response_type() == 'json':
             return {'route':self.url, 'is_redirect':False if isinstance(self.response_obj, dict) else self.response_obj.isredirect, 'html':open(f'jnet_static_folder/{"url_name_error_template.html" if isinstance(self.response_obj, dict) else "invalid_response_error_template.html"}').read().format(self.url)}
         return {'route':self.url, 'is_redirect':False if isinstance(self.response_obj, dict) else self.response_obj.isredirect, **{i:open(f'jnet_static_folder/on_response.{i}').read() if i == 'html' else f'jnet_static_folder/on_response.{i}' for i in ['html', 'js', 'css'] if hasattr(self.response_obj.payload, i) and getattr(self.response_obj.payload, i)}}
+    
     @classmethod
     @jnet_utilities.time_query()
     def accept_query(cls, _tab:int, _url:str, _forms) -> typing.Callable:
