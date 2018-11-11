@@ -472,3 +472,133 @@ body{
       background-color: #EAEAEA;
 
     }
+
+    .__app_listing_banner__{
+      padding-top:10px;
+      color:black;
+      font-family: 'Istok Web', sans-serif;
+      font-size:30px;
+      padding-left:10px;
+    }
+    .__listing_border_bar__{
+      height:1.5px;
+      width:90%;
+      background-color: #FF8C00;
+    }
+    .__listing_text__{
+      font-family: 'Istok Web', sans-serif;
+    }
+    .__create_app__{
+      padding:20px;
+      background-color: #FF8C00;
+      color:white;
+      border-radius:50%;
+      width:70px;
+      height:70px;
+      text-align: center;
+      -webkit-box-shadow: 6px 9px 18px -6px rgba(0,0,0,0.55);
+  -moz-box-shadow: 6px 9px 18px -6px rgba(0,0,0,0.55);
+  box-shadow: 6px 9px 18px -6px rgba(0,0,0,0.55);
+    }
+    .__create_app__:hover{
+      background-color:#DF6B0F;
+    }
+    .__app_message__{
+      text-align: center;
+      margin:0 auto;
+      margin-top:100px;
+      -webkit-box-shadow: 2px 4px 12px -4px rgba(0,0,0,0.75);
+      -moz-box-shadow: 2px 4px 12px -4px rgba(0,0,0,0.75);
+      box-shadow: 2px 4px 12px -4px rgba(0,0,0,0.75);
+      width:860px;
+      padding:40px;
+      padding-top:1px;
+      border-radius:6px;
+      background-color: #EAEAEA;
+  
+    }
+    .__intro_listing_text__{
+      color:#FF8C00;
+        font-family: 'Istok Web', sans-serif;
+    }
+    .__get_started_app_creation__{
+      padding:10px;
+      background-color: #FF8C00;
+      border-radius:5px;
+      border:none;
+      font-size:20px;
+      color:white;
+    }
+    .__get_started_app_creation__:hover{
+      -webkit-transition: 0.2s;
+      background-color: #DF6B0F;
+  
+    }
+
+    .__design_app_choice__{
+      margin:0 auto;
+      margin-top:100px;
+      -webkit-box-shadow: 2px 4px 12px -4px rgba(0,0,0,0.75);
+      -moz-box-shadow: 2px 4px 12px -4px rgba(0,0,0,0.75);
+      box-shadow: 2px 4px 12px -4px rgba(0,0,0,0.75);
+      width:600px;
+      padding:40px;
+      padding-top:1px;
+      border-radius:6px;
+      background-color: #EAEAEA;
+    }
+    .__app_dev_option__:hover{
+      text-decoration: underline;
+    }
+
+    .__app_creation_form__{
+
+      margin:0 auto;
+      font-family: 'Istok Web', sans-serif;
+      margin-top:100px;
+      -webkit-box-shadow: 2px 4px 12px -4px rgba(0,0,0,0.75);
+      -moz-box-shadow: 2px 4px 12px -4px rgba(0,0,0,0.75);
+      box-shadow: 2px 4px 12px -4px rgba(0,0,0,0.75);
+      width:700px;
+      padding:40px;
+      height:550px;
+      padding-top:1px;
+      border-radius:6px;
+      background-color: #EAEAEA;
+      margin-bottom:300px;
+
+
+    }
+    .__app_creation_wrapper__{
+      margin:0 auto;
+      width:500px;
+      height:auto;
+    }
+    .__app_attribute_value__{
+      border:none;
+      border-bottom:solid;
+      width:400px;
+      background: none;
+      height:40px;
+      font-size:20px;
+      padding-bottom:10px;
+      border-bottom-width:1.7px;
+      border-bottom-color:#FF8C00;
+    }
+    .__app_attribute_value__:focus{
+      outline:none;
+    }
+    .__submit_app_create_form__{
+      padding:10px;
+      border-radius:5px;
+      background-color: #FF8C00;
+      border:none;
+      color:white;
+      font-size:20px;
+      float:right;
+
+    }
+    .__submit_app_create_form__:hover{
+      -webkit-transition:0.2s;
+      background-color:#DF6B0F;
+    }
