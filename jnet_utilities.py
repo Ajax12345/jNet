@@ -159,7 +159,7 @@ def terminate_delay(_time):
     return _wrapper
 
 
-def create_app(_name:str, _description, _host:str) -> None:
+def create_app(_name:str, _description:str, _host:str) -> None:
     d = datetime.datetime.now()
     _ = os.system(f'mkdir apps/app_{_name}')
     _timestamp = '-'.join(str(getattr(d, i)) for i in ['month', 'day', 'year'])+' '+':'.join(str(getattr(d, i)) for i in ['hour', 'minute', 'second'])
@@ -314,3 +314,60 @@ class jNetHistory:
     @classmethod
     def render_filter_history(cls, keyword):
         return jinja2.Template(open('jnet_static_folder/browser_filter_history_results.html').read()).render(history = cls.get_history(_filter_keyword = keyword))
+
+    
+class UserApps:
+    class App:
+        @classmethod
+        def snapshot(cls, _name:str) -> typing.Callable:
+            with open(f'apps/app_{_name}/app_config.json') as f:
+                _config = json.load(f)
+            _db_views = list(sqlite3.connect(f'apps/app_{_name}/__views__.db').cursor().execute("SELECT * FROM views"))
+            return cls(_name, _config, _db_views)
+        def __init__(self, _name:str, _config:dict, _db_views:list) -> None:
+            self.app_name = _name
+            self.__dict__.update(_config)
+            self.db_views = _db_views
+        @property
+        def browser_url(self):
+            return f'jnet-browser:@apps/app/{self.app_name}'
+        @property
+        def timestamp(self):
+            _y, _m, _d, _hh, _mm, _ss = self.created_on
+            return f'{_m}/{_d}/{_y} at {_hh%12}:{_mm} {"AM" if _hh < 12 else "PM"}'
+        @property
+        def monthly_views(self):
+            _d = datetime.datetime.now()
+            _val = sum(i[0] == _d.year and i[1] == _d.month for i in self.db_views)
+            return _val
+        @property
+        def view_format(self):
+            return 'views' if self.monthly_views != 1 else 'view'
+            
+        @property
+        def status_color(self):
+            return ['red', 'green'][bool(self.live)]
+
+        @property
+        def status_text(self):
+            return ['Not deployed', 'Live'][bool(self.live)]
+
+        def __repr__(self):
+            return f'{self.__class__.__name__}({self.app_name})'
+    def __init__(self, _listing:list) -> None:
+        self._listing = _listing
+    def __bool__(self):
+        return bool(self._listing)
+    def __contains__(self, _app:str) -> bool:
+        return _app in self._listing
+    @property
+    def num(self):
+        return len(self._listing)
+    def __iter__(self):
+        for _app in self._listing:
+            print('app here', _app)
+            yield self.__class__.App.snapshot(_app)
+    @classmethod
+    def display_apps(cls) -> typing.Callable:
+        return cls([re.sub('^app_', '', i) for i in os.listdir('apps')])
+    
