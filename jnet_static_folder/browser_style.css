@@ -602,3 +602,44 @@ body{
       -webkit-transition:0.2s;
       background-color:#DF6B0F;
     }
+    .__app_num_display__{
+      padding-top:4px;
+      padding-bottom:4px;
+      padding-right:10px;
+      padding-left:10px;
+      color:white;
+      background-color: #FF8C00;
+      border-radius:50%;
+    
+    }
+
+    .__app_display_listing__{
+      width:1000px;
+      max-height:700px;
+      overflow:scroll;
+      padding-left:20px;
+    }
+    .__app_title__{
+      font-size:25px;
+      padding-top:10px;
+      padding-left:10px;
+
+    }
+    .__app_title__:hover{
+      text-decoration: underline;
+      padding-top:10px;
+      padding-left:10px;
+    }
+    .__app_snapshot__{
+      width:600px;
+      background-color:#EAEAEA;
+      border-radius:8px;
+      -webkit-box-shadow: 2px 4px 12px -4px rgba(0,0,0,0.75);
+      -moz-box-shadow: 2px 4px 12px -4px rgba(0,0,0,0.75);
+      box-shadow: 2px 4px 12px -4px rgba(0,0,0,0.75);
+
+    }
+    .__status_pill__{
+      padding:5px;
+      border-radius: 4px;
+    }
