@@ -18,8 +18,13 @@ import on_connection_actions
 #TODO: cache tab content
 #TODO: update app creation function to include server hosting of app
 #TODO: add the ability to update internal server listing
-#UPDATED on 11/11/18 (must be uploaded to Github):
 #TODO: build form posting with element data attributes
+#TODO: flip history listing
+#TODO: change app views to total views, rather than monthly views
+#TOUPDATE:
+#   jnet_utilities.py
+#   browser_style.css
+#   full_app_listing.html
 eel.init('jnet_static_folder')
 
 class TaskManager:
@@ -172,7 +177,10 @@ def accept_dynamic_query_form(jnet_url, _tab, _form):
         print('for app creation ', type(_result))
         return _result
 
-
+@eel.expose
+def delete_app(_title):
+    jnet_utilities.delete_user_app(_title)
+    return "done"
 
 
 #eel.start('main_window.html')
