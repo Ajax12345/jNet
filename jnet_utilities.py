@@ -164,7 +164,7 @@ def create_app(_name:str, _description:str, _host:str) -> None:
     _ = os.system(f'mkdir apps/app_{_name}')
     _timestamp = '-'.join(str(getattr(d, i)) for i in ['month', 'day', 'year'])+' '+':'.join(str(getattr(d, i)) for i in ['hour', 'minute', 'second'])
     with open(f'apps/app_{_name}/app_config.json', 'w') as f:
-        json.dump({'live':False, 'created_on':[getattr(d, i) for i in ['year', 'month', 'day', 'hour', 'minute', 'second']], 'description':_description, 'host':_host}, f)
+        json.dump({'live':False, 'created_on':[getattr(d, i) for i in ['year', 'month', 'day', 'hour', 'minute', 'second']], 'description':_description, 'host':_host, 'deleted':False}, f)
     
     _ = os.system(f'mkdir apps/app_{_name}/templates')
     with open(f'apps/app_{_name}/templates/home.html', 'w') as f:
@@ -254,6 +254,15 @@ def jsonify_result(f):
     return _wrapper
 
 
+def delete_user_app(_name:str) -> None:
+    with open(f'apps/app_{_name}/app_config.json') as f:
+        data = json.load(f)
+        data['deleted'] = True
+
+    with open(f'apps/app_{_name}/app_config.json', 'w') as f:
+        print('deletion_data here', data)
+        json.dump(data, f)
+
 def cache_request_response(f):
     #_time_completed:float, _tab:int, _url:str, _, _response_obj:BrowserResponse
     def _wrapper(_inst, *args):
@@ -282,7 +291,7 @@ class jNetHistory:
         @staticmethod
         def calc_timestamp(*args) -> str:
             _h, _m, _s = args
-            return f'{_h%12}:{str(_m).zfill(2)} {"PM" if _h >= 12 else "AM"}'
+            return f'{_h%12 if _h%12 else 12}:{str(_m).zfill(2)} {"PM" if _h >= 12 else "AM"}'
         @property
         def day_occured(self):
             _mdy, _hms = self.timestamp.split()
@@ -302,7 +311,7 @@ class jNetHistory:
     def __bool__(self):
         return bool(self._content)
     def __iter__(self):
-        yield from self._content
+        yield from self._content[::-1]
     @classmethod
     def get_history(cls, _filter_keyword = ''):
         _content = list(sqlite3.connect('browser_settings/browser_history.db').cursor().execute("SELECT * FROM history"))
@@ -360,13 +369,21 @@ class UserApps:
         return bool(self._listing)
     def __contains__(self, _app:str) -> bool:
         return _app in self._listing
+    @classmethod
+    def is_deleted(cls, _name:str) -> bool:
+        with open(f'apps/app_{_name}/app_config.json') as f:
+            d = json.load(f)
+            return d.get('deleted', False)
+
     @property
     def num(self):
-        return len(self._listing)
+        return sum(not self.__class__.is_deleted(i) for i in self._listing)
+
     def __iter__(self):
         for _app in self._listing:
-            print('app here', _app)
-            yield self.__class__.App.snapshot(_app)
+            if not self.__class__.is_deleted(_app):
+                yield self.__class__.App.snapshot(_app)
+
     @classmethod
     def display_apps(cls) -> typing.Callable:
         return cls([re.sub('^app_', '', i) for i in os.listdir('apps')])
