@@ -696,3 +696,17 @@ body{
       background:none;
       border:none;
     }
+    .__invalid_tag_display__{
+      margin-left:70px;
+    }
+    .__full_filtered_tag_display__{
+      padding:5px;
+      border-radius:3px;
+      background-color:#F1BD1C;
+    }
+    .__invalid_tag__{
+
+    } 
+    .__invalid_tag__:hover{
+      text-decoration: underline;
+    }
