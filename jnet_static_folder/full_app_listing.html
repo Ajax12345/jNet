@@ -32,8 +32,8 @@
     <div class='__spacer__' style='height:30px'></div>
      <div class='__app_display_listing__'>
        {%for app in apps%}
-        <div class='__app_snapshot__' style='margin:0 auto'>
-            <h1 class='__app_title__ __div_href__' data-link = '{{app.browser_url}}' data-tab='true'>{{app.app_name}}</h1>
+        <div class='__app_snapshot__' id='__app_pannel_{{app.app_name}}__' style='margin:0 auto'>
+            <h1 class='__app_title__' id='{{app.app_name}}'>{{app.app_name}}</h1>
             <div class='__spacer__' style='height:5px'></div>
             {%if app.description%}
               <p style='padding-left:20px;color:#767676;'>{{app.description}}</p>
@@ -42,13 +42,14 @@
             <div class='__spacer__' style='height:10px'></div>
             <div class='container'>
               <div class='row'>
-                <div class='col'><span>Status: <span class='__status_pill__' style='background-color:{{app.status_color}};color:white;'><strong>{{app.status_text}}</strong></span></span></div>
+                <div class='col'><span>Status: <span id='__app_visibility_{{app.app_name}}__' class='__status_pill__' style='background-color:{{app.status_color}};color:white;'><strong>{{app.status_text}}</strong></span></span></div>
                 <div class='col'><span><span style='color:#FF8C00'>{{app.monthly_views}}</span><span style='width:4px;'></span><span style='padding-left:4px'>{{app.view_format}}</span></div>
               </div>
             </div>
-            
+            <div id='__display_settings_for_{{app.app_name}}__' class='__app_extra_info__'></div>
             
             <div class='__spacer__' style='height:20px'></div>
+
         </div>
         <div class='__spacer__' style='height:60px'></div>
       {%endfor%}
