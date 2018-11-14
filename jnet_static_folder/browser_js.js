@@ -4,7 +4,11 @@ async function get_app_listing_html(){
 }
 async function delete_user_app(title){
   let _final_result = await eel.delete_app(title)();
-  
+
+}
+async function scan_enable_app(title){
+  let _html_result = await eel.enable_app_check(title)();
+  $('#__display_invalid_tag_'+title+'__').html(_html_result);
 }
 
 async function create_jnet_app(link, payload){
@@ -577,6 +581,7 @@ async function update_browser_owner_display(){
         <div style='height:1.5px;width:600px;background-color:#CFCFCF;margin: 0 auto;'></div>
         <div class='__spacer__' style='height:40px;'></div>
         <button class='__enable_app__' id='__enable_${_app_title}__'>Enable app</button>
+        <div class='__invalid_tag_display__' id='__display_invalid_tag_${_app_title}__'></div>
         <div class='__spacer__' style='height:40px;'></div>
         <div class='__app_deletion_verification__' id='__app_deletion_verification_for_${_app_title}__'></div>
         <table>
@@ -638,5 +643,10 @@ async function update_browser_owner_display(){
     $('#__app_deletion_verification_for_'+_title+'__').html('');
     $('#__delete_'+_title+'__').text('Delete app');
     $('#__cancel_delete_'+_title+'__').html('');
+  });
+  $('.content_place').on('click', '.__enable_app__', function(){
+    var _full_id = this.id;
+    var _app_title = _full_id.substring(9, _full_id.length-2);
+    scan_enable_app(_app_title);
   });
 });
