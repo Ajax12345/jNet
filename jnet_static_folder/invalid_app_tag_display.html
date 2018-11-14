@@ -1,0 +1,19 @@
+<div style='height:8px;'></div>
+{%if classes%}
+    <p><strong>{{classes.num}}</strong> invalid {{classes.text}} found:</p>
+    <div style='height:2px;'></div>
+    <div class='__full_filtered_tag_display__'>
+        <p>{{classes.display_content}}</p>
+
+    </div>
+    <div style='height:10px;'></div>
+{%endif%}
+{%if ids%}
+    <p>{{ids.num}} invalid {{ids.text}} found:</p>
+    <div style='height:2px;'></div>
+    <div class='__full_filtered_tag_display__'>
+            <p>{{ids.display_content}}</p>
+    
+        </div>
+    <div style='height:10px;'></div>
+{%endif%}
