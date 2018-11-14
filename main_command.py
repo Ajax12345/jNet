@@ -7,7 +7,7 @@ import socket, requests
 from bs4 import BeautifulSoup as soup
 import contextlib, typing, json
 import jnet_utilities, jnet_connectors
-import on_connection_actions
+import on_connection_actions, jinja2
 
 #NOTE: will need to adjust recv_size in interal_morpheus
 #TODO: build local routing object under the "jnet-browser" server
@@ -183,5 +183,11 @@ def delete_app(_title):
     return "done"
 
 
+@eel.expose
+def enable_app_check(_name):
+    _invalid = jnet_utilities.invalid_tag_names(_name)
+    _classes = [i for i in _invalid if i.attr_type == 'class']
+    _ids = [i for i in _invalid if i.attr_type == 'id']
+    return jinja2.Template(open('jnet_static_folder/invalid_app_tag_display.html').read()).render(classes = jnet_utilities._tag_templating(_classes), ids = jnet_utilities._tag_templating(_ids))
 #eel.start('main_window.html')
 eel.start('browser_window.html')
