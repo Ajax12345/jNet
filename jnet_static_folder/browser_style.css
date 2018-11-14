@@ -642,4 +642,57 @@ body{
     .__status_pill__{
       padding:5px;
       border-radius: 4px;
+      font-size:13px;
+    }
+    .__app_extra_info__{
+      background-color:#EAEAEA;
+      border-bottom-left-radius: 6px;
+      border-bottom-right-radius: 6px;
+      width:400px;
+
+    }
+    .__delete_app__{
+      margin-left:70px;
+      background-color: red;
+      border:none;
+      padding:7px;
+      border-radius:5px;
+      color:white;
+      font-size:18px;
+      
+    }
+    .__enable_app__{
+      margin-left:70px;
+      background-color: green;
+      border:none;
+      border-radius:5px;
+      color:white;
+      padding:7px;
+      font-size:18px;
+      
+    }
+    .__disable_app__{
+      margin-left:70px;
+      background-color: red;
+      border:none;
+      border-radius:5px;
+      color:white;
+      padding:7px;
+      font-size:18px;
+    }
+    .__cancel_deletion__{
+      margin-left:70px;
+      /*
+      background-color: red;
+      border:none;
+      padding:7px;
+      border-radius:5px;
+      color:white;
+      font-size:18px;
+      */
+      font-size:15px;
+      text-decoration: underline;
+      color:red;
+      background:none;
+      border:none;
     }
