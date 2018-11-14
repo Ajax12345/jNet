@@ -4,6 +4,7 @@ import datetime, contextlib, sqlite3
 import typing, tigerSqlite
 import multiprocessing, itertools
 import time, os, jinja2
+from bs4 import BeautifulSoup as soup
 
 def test_passcode(_code:str) -> bool:
     '''only supported on Darwin'''
@@ -388,3 +389,66 @@ class UserApps:
     def display_apps(cls) -> typing.Callable:
         return cls([re.sub('^app_', '', i) for i in os.listdir('apps')])
     
+
+class _tag:
+    def __init__(self, _rule:typing.Callable[[str], bool]) -> None:
+        self._rule = _rule
+    def __call__(self, _tag_id_class:str) -> bool:
+        return self._rule(_tag_id_class)
+    
+class _class:
+    def __init__(self, _class_name:str) -> None:
+        self._attr = _class_name
+    @property
+    def attr_type(self):
+        return self.__class__.__name__[1:]
+    def __eq__(self, _val:str) -> bool:
+        return self._attr == _val._attr
+    def __repr__(self):
+        return f'<{self.attr_type} attribute "{self._attr}">'
+
+class _id:
+    def __init__(self, _id_name:str) -> None:
+        self._attr = _id_name
+    @property
+    def attr_type(self):
+        return self.__class__.__name__[1:]
+    def __eq__(self, _val:str) -> bool:
+        return self._attr == _val._attr
+    def __repr__(self):
+        return f'<{self.attr_type} attribute "{self._attr}">'
+
+class _tag_templating:
+    def __init__(self, _listing:typing.List[typing.Callable]) -> None:
+        self._tags = _listing
+    @property
+    def num(self):
+        return len(self._tags)
+    def __bool__(self):
+        return bool(self._tags)
+    @property
+    def display_content(self):
+        return ', '.join(self)
+    @property
+    def text(self):
+        _preface = self._tags[0].__class__.__name__[1:]
+        return _preface if self.num == 1 else f'{_preface}s' if _preface == 'id' else 'classes'
+    def __iter__(self):
+        for i in self._tags:
+            yield f'<strong class="__invalid_tag__">{i._attr}</strong>'
+
+def invalid_tag_names(_app:str) -> typing.List[str]:
+    def all_tags(d):
+        _attrs = getattr(d, 'attrs', {})
+        yield from map(_class, _attrs.get('class', []))
+        yield from map(_id, ([] if 'id' not in _attrs else [_attrs['id']]))
+        for i in getattr(d, 'contents', []):
+            if not isinstance(d, str):
+                yield from all_tags(i)
+
+    _keep = [_tag(lambda x:x._attr in ['col', 'row', 'container', 'col-md-auto']), _tag(lambda x:bool(re.findall('^fa\-|^fas', x._attr)))]
+    _html_files = [i for i in os.listdir('jnet_static_folder') if re.findall('\.html$', i)]
+    _forbidden = [i for b in _html_files for i in all_tags(soup(open(f'jnet_static_folder/{b}').read(), 'html.parser'))]
+    _filtered_forbidden = [i for i in _forbidden if all(not _k(i) for _k in _keep)]
+    _app_tags = [i for b in os.listdir(f'apps/app_{_app}/templates') for i in all_tags(soup(open(f'apps/app_{_app}/templates/{b}').read(), 'html.parser')) if re.findall('\.html$', b)]
+    return [i for i in _app_tags if any(c == i for c in _filtered_forbidden)]
