@@ -19,7 +19,6 @@ import on_connection_actions, jinja2
 #TODO: update app creation function to include server hosting of app
 #TODO: add the ability to update internal server listing
 #TODO: build form posting with element data attributes
-#TODO: flip history listing
 #TODO: change app views to total views, rather than monthly views
 #TOUPDATE:
 #   jnet_utilities.py
