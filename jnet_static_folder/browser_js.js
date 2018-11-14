@@ -2,6 +2,10 @@ async function get_app_listing_html(){
   let _html = await eel.get_app_listing()();
   $('.content_place').html(_html);
 }
+async function delete_user_app(title){
+  let _final_result = await eel.delete_app(title)();
+  
+}
 
 async function create_jnet_app(link, payload){
 
@@ -547,5 +551,92 @@ async function update_browser_owner_display(){
   });
   $('.content_place').on('input', '#__app_creation_name__', function(){
     $('.__on_app_name_error__').html('');
+  });
+  $('.content_place').on('click', '.__app_title__', function(){
+    
+    var _app_title = this.id;
+    if ($('#__display_settings_for_'+_app_title+'__').html() != ''){
+      $('#__display_settings_for_'+_app_title+'__').html('');
+    }
+    else{
+      var _visibility = $('#__app_visibility_'+_app_title+'__').text();
+
+      var new_html_ = `
+      <div class='__spacer__' style='height:20px;'></div>
+        <div style='height:1.5px;width:600px;background-color:#CFCFCF;margin: 0 auto;'></div>
+        <div class='__spacer__' style='height:40px;'></div>
+        <button class='__disable_app__' id='__disable_${_app_title}__'>Disable app</button>
+        <div class='__spacer__' style='height:40px;'></div>
+        <button class='__delete_app__' id='__delete_${_app_title}__'>Delete</button>
+        <div class='__app_deletion_verification__' id='__app_deletion_verification_for${_app_title}'></div>
+        <div class='__spacer__' style='height:20px;'></div>
+      `;
+      if (_visibility === 'Not deployed'){
+        var new_html_ = `
+        <div class='__spacer__' style='height:20px;'></div>
+        <div style='height:1.5px;width:600px;background-color:#CFCFCF;margin: 0 auto;'></div>
+        <div class='__spacer__' style='height:40px;'></div>
+        <button class='__enable_app__' id='__enable_${_app_title}__'>Enable app</button>
+        <div class='__spacer__' style='height:40px;'></div>
+        <div class='__app_deletion_verification__' id='__app_deletion_verification_for_${_app_title}__'></div>
+        <table>
+          <tr>
+            <td><button class='__delete_app__' id='__delete_${_app_title}__'>Delete app</button></td>
+            <td id='__cancel_delete_${_app_title}__'></td>
+          </tr>
+        </table>
+        
+        
+        <div class='__spacer__' style='height:20px;'></div>
+      `;
+      }
+      $('#__display_settings_for_'+_app_title+'__').html(new_html_);
+     }
+    
+  });
+  $('.content_place').on('click', '.__delete_app__', function(){
+    var _full_id = this.id
+    var _title = _full_id.substring(9, _full_id.length-2);
+    if ($(this).text() === 'Confirm deletion'){
+      if ($('#__confirmdelete_'+_title+'__').val() === _title){
+        $('#__app_pannel_'+_title+'__').remove();
+        var _current_count = parseInt($('.__app_num_display__').text()) - 1;
+        $('.__app_num_display__').text(_current_count);
+        delete_user_app(_title);
+
+      }
+      else{
+        $('#__invalid_confirmation_for_'+_title+'__').html('<p style="font-size:13px;color:#FF3402;margin-left:70px;">App titles do not match</p>')
+      }
+    }
+    else{
+      var new_html =`
+
+      <p style='margin-left:70px'><strong>Type the name of the app you wish to delete:</strong></p>
+      <input type='text' class='__app_attribute_value__' id='__confirmdelete_${_title}__' style='margin-left:70px;width:320px;height:35px;font-size:19px' placeholder='app name'>
+      <div id='__invalid_confirmation_for_${_title}__'></div>
+      <div style='height:20px'></div>
+    
+      `
+      $('#__app_deletion_verification_for_'+_title+'__').html(new_html);
+      $('#__delete_'+_title+'__').text('Confirm deletion');
+      var deletion_html = `
+      <button class='__cancel_deletion__' id='__cancel_delete_${_title}__'>Cancel</button>
+      `;
+      $('#__cancel_delete_'+_title+'__').html(deletion_html);
+    }
+    
+  });
+  $('.content_place').on('input', '.__app_attribute_value__', function(){
+    var _full_id = this.id
+    var _title = _full_id.substring(16, _full_id.length-2);
+    $('#__invalid_confirmation_for_'+_title+'__').html('');
+  });
+  $('.content_place').on('click', '.__cancel_deletion__', function(){
+    var full_id = this.id;
+    var _title = full_id.substring(16, full_id.length-2);
+    $('#__app_deletion_verification_for_'+_title+'__').html('');
+    $('#__delete_'+_title+'__').text('Delete app');
+    $('#__cancel_delete_'+_title+'__').html('');
   });
 });
