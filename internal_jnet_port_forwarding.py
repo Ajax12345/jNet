@@ -87,8 +87,8 @@ if __name__ == '__main__':
    
 
     class NetVals:
-        root = 'zorro16'
-        lan_ip = '192.168.0.5'
+        root = '**********'
+        lan_ip = '**********'
         forward_ports = True
         port = 6000
         from_port = 8423
